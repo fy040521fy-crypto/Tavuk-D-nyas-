@@ -191,14 +191,18 @@ function renderStock(){
  const low=data.stock.filter(x=>Number(x.qty)<=Number(x.min)).length;
  document.getElementById('stockNotice').innerHTML=low?`<div class="notice">${low} ürün minimum stok seviyesinde veya altında. Sipariş ihtiyacını kontrol edin.</div>`:'';
 }
-function renderStats(){
+ function renderStats(){
  const done=Object.values(data.checks[today()]||{}).filter(Boolean).length;
  document.getElementById('doneCount').textContent=`${done} / ${data.checkItems.length}`;
- document.getElementById('leftCount').textContent=Math.max(0,data.checkItems.length-done);
- document.getElementById('expiryCount').textContent=data.expiry.filter(x=>daysUntil(x.date)<=3).length;
- document.getElementById('lowCount').textContent=data.stock.filter(x=>Number(x.qty)<=Number(x.min)).length;
+ }
+
+ 
+function render(){
+ renderChecks();
+ renderExpiry();
+ renderStock();
+ renderStats();
 }
-function render(){renderChecks();renderExpiry();renderStock();renderStats();if(typeof renderDashboard==='function')renderDashboard();}
 function esc(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
 window.removeItem=(type,i)=>{if(confirm('Bu kaydı silmek istiyor musunuz?')){data[type].splice(i,1);persist();}};
 document.querySelectorAll('[data-tab]').forEach(b=>b.addEventListener('click',()=>{document.querySelectorAll('[data-tab]').forEach(x=>x.classList.toggle('active',x===b));['checks','expiry','stock','staff','reports','history'].forEach(id=>document.getElementById(id).classList.toggle('hidden',id!==b.dataset.tab));if(b.dataset.tab==='history')renderHistory();if(b.dataset.tab==='staff')renderStaff();if(b.dataset.tab==='reports')renderSalesReport();}));
