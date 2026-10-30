@@ -396,5 +396,6 @@ window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();deferredIns
 document.addEventListener('click',async e=>{if(e.target&&e.target.id==='pwaInstallBtn'&&deferredInstallPrompt){deferredInstallPrompt.prompt();await deferredInstallPrompt.userChoice;deferredInstallPrompt=null;document.getElementById('pwaInstallBar').style.display='none';}});
 window.addEventListener('appinstalled',()=>{const bar=document.getElementById('pwaInstallBar');if(bar)bar.style.display='none';});
 </script>
+ <script src="./cloud.js"></script>
 </body></html>
 <script>if('serviceWorker' in navigator && location.protocol!=='file:'){window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{}));}</script>
