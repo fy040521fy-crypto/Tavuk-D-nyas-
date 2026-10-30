@@ -1,17 +1,17 @@
 {
-  "id":"/",
-  "name":"Akıllı Restoran Yönetim Sistemi",
-  "short_name":"Restoran Yönetimi",
-  "description":"Restoran operasyon, personel satış, stok ve raporlama sistemi",
-  "lang":"tr-TR",
-  "start_url":"./index.html",
-  "scope":"./",
-  "display":"standalone",
-  "orientation":"any",
-  "background_color":"#fbf7f9",
-  "theme_color":"#68002f",
-  "icons":[
-    {"src":"icons/icon-192.png","sizes":"192x192","type":"image/png","purpose":"any maskable"},
-    {"src":"icons/icon-512.png","sizes":"512x512","type":"image/png","purpose":"any maskable"}
+  "id": "/",
+  "name": "Akıllı Restoran Yönetim Sistemi",
+  "short_name": "Restoran Yönetimi",
+  "description": "Restoran operasyon, personel satış ve yönetim takip sistemi",
+  "lang": "tr-TR",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#fbf7f9",
+  "theme_color": "#68002f",
+  "icons": [
+    {"src": "./ikon-192.png", "sizes": "192x192", "type": "image/png"},
+    {"src": "./ikon-512.png", "sizes": "512x512", "type": "image/png"}
   ]
 }
