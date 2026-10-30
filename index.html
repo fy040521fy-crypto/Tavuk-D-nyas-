@@ -310,7 +310,7 @@ function renderDashboard(){
  document.getElementById('dashTodayRate').textContent=target>0?Math.round(rev/target*100)+'%':'-%';
  document.getElementById('dashMonthRevenue').textContent=money(monthRev);
  
- 
+ const labels=[['Başlangıç','start'],['K. Başlangıç','kstart'],['Çorba','soup'],['Tatlı','dessert'],['Ferahlatan içecek','drink']];
  document.getElementById('dashProductTotals').innerHTML=labels.map(([label,key])=>`<tr><td>${label}</td><td>${sum(todayRows,key)}</td><td>${sum(monthRows,key)}</td></tr>`).join('');
 }
 function renderStaff(){
