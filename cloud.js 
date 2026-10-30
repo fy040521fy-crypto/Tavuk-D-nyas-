@@ -1,0 +1,179 @@
+(() => {
+  const SUPABASE_URL = 'https://abnjvfgewtaotowcmlfy.supabase.co';
+  const SUPABASE_KEY = 'sb_publishable_XeUSf_mRFAWLcgWtW3Ykjw_1sb-d3Um';
+  const STORAGE_KEY = 'restaurant-manager-v1';
+
+  const style = document.createElement('style');
+  style.textContent = `
+    #cloudLogin {
+      position:fixed; inset:0; z-index:99999; background:#171717;
+      display:flex; align-items:center; justify-content:center; padding:20px;
+    }
+    #cloudLogin .loginbox {
+      background:white; color:#30242a; padding:24px; border-radius:16px;
+      width:100%; max-width:380px; font-family:system-ui,sans-serif;
+    }
+    #cloudLogin input {
+      display:block; width:100%; box-sizing:border-box; padding:12px;
+      margin:10px 0; border:1px solid #ddd; border-radius:9px; font-size:16px;
+    }
+    #cloudLogin button {
+      width:100%; padding:13px; background:#68002f; color:white;
+      border:0; border-radius:9px; font-size:16px; margin-top:8px;
+    }
+    #cloudMessage {font-size:13px; margin-top:12px; color:#68002f;}
+  `;
+  document.head.appendChild(style);
+
+  const gate = document.createElement('div');
+  gate.id = 'cloudLogin';
+  gate.innerHTML = `
+    <div class="loginbox">
+      <h2>Yönetici girişi</h2>
+      <p>Akıllı Restoran Yönetim Sistemi</p>
+      <input id="cloudEmail" type="email" placeholder="Yönetici e-posta adresi">
+      <input id="cloudPassword" type="password" placeholder="Şifre">
+      <button id="cloudLoginButton">Giriş yap</button>
+      <div id="cloudMessage">Ortak kayıt sistemine bağlanmaya hazır.</div>
+    </div>
+  `;
+  document.body.appendChild(gate);
+
+  const say = message => {
+    document.getElementById('cloudMessage').textContent = message;
+  };
+
+  let client;
+  let applyingRemote = false;
+  let saveTimer = null;
+  let pollTimer = null;
+  let lastRemote = '';
+
+  function applyRemote(payload) {
+    applyingRemote = true;
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
+    if (typeof data !== 'undefined') {
+      data = payload;
+      data.checks = data.checks || {};
+      data.expiry = data.expiry || [];
+      data.stock = data.stock || [];
+      data.checkItems = Array.isArray(data.checkItems) ? data.checkItems : [];
+      data.dailyInfo = data.dailyInfo || {};
+      data.history = data.history || {};
+      data.staff = Array.isArray(data.staff) ? data.staff : [];
+      if (typeof render === 'function') render();
+    }
+    applyingRemote = false;
+    lastRemote = JSON.stringify(payload);
+  }
+
+  async function readRemote() {
+    const result = await client
+      .from('app_data')
+      .select('payload')
+      .eq('record_type', 'shared_state')
+      .maybeSingle();
+
+    if (result.error) throw result.error;
+    return result.data ? result.data.payload : null;
+  }
+
+  async function saveRemote(payload) {
+    const result = await client.rpc('save_app_state', {
+      p_payload: payload
+    });
+    if (result.error) throw result.error;
+    lastRemote = JSON.stringify(payload);
+  }
+
+  function queueSave(value) {
+    if (!client || applyingRemote) return;
+    clearTimeout(saveTimer);
+    saveTimer = setTimeout(async () => {
+      try {
+        const payload = JSON.parse(value);
+        await saveRemote(payload);
+        say('Ortak kayıtlar buluta kaydedildi.');
+      } catch (error) {
+        say('Buluta kayıt hatası: ' + error.message);
+      }
+    }, 1200);
+  }
+
+  const originalSetItem = Storage.prototype.setItem;
+  Storage.prototype.setItem = function(key, value) {
+    originalSetItem.call(this, key, value);
+    if (this === localStorage && key === STORAGE_KEY && !applyingRemote) {
+      queueSave(value);
+    }
+  };
+
+  async function startSync() {
+    const admin = await client.rpc('is_app_admin');
+    if (admin.error) throw admin.error;
+    if (admin.data !== true) {
+      throw new Error('Bu hesap yönetici olarak yetkilendirilmemiş.');
+    }
+
+    const remote = await readRemote();
+
+    if (remote) {
+      applyRemote(remote);
+      say('Ortak kayıtlar yüklendi. Sistem hazır.');
+    } else {
+      const local = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
+      await saveRemote(local);
+      say('İlk kayıt buluta aktarıldı. Sistem hazır.');
+    }
+
+    gate.style.display = 'none';
+
+    pollTimer = setInterval(async () => {
+      try {
+        const latest = await readRemote();
+        if (!latest) return;
+        const fingerprint = JSON.stringify(latest);
+        const local = localStorage.getItem(STORAGE_KEY) || '{}';
+
+        if (fingerprint !== lastRemote && fingerprint !== local) {
+          clearTimeout(saveTimer);
+          applyRemote(latest);
+          say('Diğer cihazdaki güncel kayıtlar alındı.');
+        }
+      } catch (error) {
+        console.warn('Ortak kayıt kontrolü:', error.message);
+      }
+    }, 10000);
+  }
+
+  document.getElementById('cloudLoginButton').addEventListener('click', async () => {
+    const email = document.getElementById('cloudEmail').value.trim();
+    const password = document.getElementById('cloudPassword').value;
+
+    if (!email || !password) {
+      say('E-posta ve şifreyi gir.');
+      return;
+    }
+
+    say('Giriş yapılıyor...');
+    document.getElementById('cloudLoginButton').disabled = true;
+
+    try {
+      const result = await client.auth.signInWithPassword({ email, password });
+      if (result.error) throw result.error;
+      await startSync();
+    } catch (error) {
+      say('Giriş veya bağlantı hatası: ' + error.message);
+      document.getElementById('cloudLoginButton').disabled = false;
+    }
+  });
+
+  const library = document.createElement('script');
+  library.src = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2';
+  library.onload = () => {
+    client = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    say('Bağlantı hazır. Yönetici bilgilerini gir.');
+  };
+  library.onerror = () => say('Bağlantı kütüphanesi yüklenemedi. İnternetini kontrol et.');
+  document.head.appendChild(library);
+})();
