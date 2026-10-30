@@ -1,0 +1,400 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#68002f"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="description" content="Akıllı Restoran Yönetim Sistemi"><link rel="manifest" href="manifest.webmanifest"><link rel="icon" href="icon.svg" type="image/svg+xml">
+<title>Akıllı Restoran Yönetim Sistemi</title>
+<style>
+:root{--brand:#96004B;--brand-dark:#68002f;--brand-soft:#f8e8f0;--brand-pink:#D393B3;--brand-red:#AE2E3A;--spice:#F8C808;--ink:#30242a;--muted:#766873;--line:#eadde4;--bg:#fbf7f9;--amber:#fff4d2;--red:#fde8e6}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:15px system-ui,-apple-system,Segoe UI,sans-serif}
+header{background:linear-gradient(115deg,var(--brand-dark),var(--brand));color:white;padding:20px max(18px,calc((100% - 1120px)/2));border-bottom:5px solid var(--spice)}
+.brandline{display:flex;align-items:center;gap:13px}
+.brandmark{width:52px;height:52px;flex:0 0 52px;border:2px solid rgba(255,255,255,.85);border-radius:16px;display:grid;place-items:center;background:rgba(255,255,255,.12);font-weight:900;font-size:17px;letter-spacing:-1px;box-shadow:0 3px 12px #35001f55}
+.brandname{font-size:12px;font-weight:800;letter-spacing:2px;color:#ffe9f2}
+header small{opacity:.9;letter-spacing:1.2px}header h1{font-size:23px;margin:3px 0}header p{margin:0;opacity:.9;font-size:13px}
+main{max-width:1120px;margin:22px auto;padding:0 16px 40px}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:18px}
+.stat,.panel{background:white;border:1px solid var(--line);border-radius:14px;padding:16px}
+.stat span{display:block;color:var(--muted);font-size:12px}.stat strong{font-size:25px;display:block;margin-top:5px}
+.tabs{display:flex;gap:8px;overflow:auto;margin:16px 0}.tabs button{border:1px solid var(--line);background:white;border-radius:10px;padding:10px 14px;white-space:nowrap;color:var(--ink);cursor:pointer}
+.tabs button.active{background:var(--brand);color:white;border-color:var(--brand);box-shadow:0 3px 9px #96004b25}
+.panel h2{font-size:18px;margin:0 0 4px}.sub{color:var(--muted);font-size:13px;margin:0 0 16px}
+.row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 0;border-top:1px solid var(--line)}
+.row:first-of-type{border-top:0}.row label{display:flex;gap:10px;align-items:center;cursor:pointer}.row input[type=checkbox]{width:19px;height:19px;accent-color:var(--brand)}
+.pill{font-size:11px;padding:4px 8px;border-radius:99px;background:var(--brand-soft);color:var(--brand)}
+button.primary{background:var(--brand);color:white;border:0;border-radius:9px;padding:10px 14px;cursor:pointer;box-shadow:0 2px 6px #96004b22}button.primary:hover{background:var(--brand-dark)}
+button.secondary{background:white;border:1px solid var(--line);border-radius:9px;padding:9px 12px;cursor:pointer}
+.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+input,select,textarea{font:inherit;padding:10px;border:1px solid var(--line);border-radius:9px;width:100%;background:white}
+.formgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;margin:12px 0}
+.tablewrap{overflow:auto}table{border-collapse:collapse;width:100%;min-width:560px}th,td{text-align:left;padding:11px;border-bottom:1px solid var(--line);font-size:13px}th{color:var(--muted);font-weight:600}
+.notice{padding:11px 13px;border-radius:10px;background:var(--amber);font-size:13px;margin:12px 0}.danger{background:var(--red)}
+.hidden{display:none}.empty{color:var(--muted);padding:18px 0;text-align:center}
+footer{color:var(--muted);font-size:12px;margin-top:16px}
+@media(max-width:700px){.stats{grid-template-columns:repeat(2,1fr)}.formgrid{grid-template-columns:1fr 1fr}header{padding:16px}.brandmark{width:46px;height:46px;flex-basis:46px}.stat{padding:13px}.stat strong{font-size:22px}}
+.report-head{text-align:center;border-bottom:3px solid #96004B;padding-bottom:10px}.report-head h1{font-size:21px;color:#96004B;margin:0}.report-head p{font-size:11px;letter-spacing:1px;color:#555}.report-meta{display:flex;justify-content:space-between;gap:15px;margin:18px 0;font-size:12px}.report-head~h3{font-size:14px;margin:18px 0 7px}.notes{border:1px solid #bbb;padding:12px;min-height:55px;font-size:12px;overflow-wrap:anywhere}.signatures{display:flex;justify-content:space-between;gap:35px;margin-top:45px}.signatures div{width:45%;border-top:1px solid #333;text-align:center;padding-top:8px;font-size:12px}.report-foot{text-align:center;color:#666;font-size:10px;margin-top:22px}
+@page{size:A4;margin:14mm}
+@media print{
+ body{background:white!important;color:#111!important;font-size:11px}
+ body *{visibility:hidden!important}
+ #salesReportPanel,#salesReportPanel *{visibility:visible!important}
+ #salesReportPanel{position:absolute;left:0;top:0;width:100%;padding:0;margin:0}
+ header,main>.stats,main>.tabs,main>#checks,main>#expiry,main>#stock,main>#staff,main>#reports>h2,main>#reports>.sub,main>#reports>.actions,main>#reports>.formgrid,main>#history,main>footer{display:none!important}
+ main{max-width:none;margin:0;padding:0}
+ #printReport{display:block!important;border:0!important;padding:0!important;margin:0!important;border-radius:0!important}
+ #printReport table{width:100%;min-width:0;border-collapse:collapse}
+ #printReport th,#printReport td{border:1px solid #aaa;padding:6px;font-size:10px;color:#111}
+ #printReport th{background:#eee!important}
+ #printReport h3{page-break-after:avoid}
+}
+</style>
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+</head>
+<body>
+<header><div class="brandline"><div class="brandmark" aria-label="Tavuk Dünyası temalı uygulama simgesi">TD</div><div><div class="brandname">RESTORAN OPERASYON PLATFORMU</div><h1>Akıllı Restoran Yönetim Sistemi</h1><p>Günlük operasyon · SKT takibi · Stok yönetimi · Raporlama</p></div><div style="margin-left:auto;display:flex;gap:8px;flex-wrap:wrap"><button class="secondary" id="backupExport">Yedeği indir</button><button class="secondary" id="backupImportBtn">Yedek yükle</button><input id="backupFile" type="file" accept="application/json" style="display:none"></div></div></header>
+<div id="pwaInstallBar" style="display:none;max-width:1120px;margin:12px auto;padding:0 16px"><button class="primary" id="pwaInstallBtn" style="width:100%">Uygulamayı telefona yükle</button></div>
+<main>
+
+<section class="panel" id="managerDashboard" style="margin-bottom:16px">
+ <h2>Yönetim özeti</h2><p class="sub">Bugünün ve içinde bulunulan ayın personel satış görünümü</p>
+ <div class="stats" style="grid-template-columns:repeat(auto-fit,minmax(145px,1fr));margin:12px 0">
+  <div class="stat"><span>Bugünkü personel cirosu</span><strong id="dashTodayRevenue">₺0</strong></div>
+  <div class="stat"><span>Bugünkü ürün adedi</span><strong id="dashTodayUnits">0</strong></div>
+  <div class="stat"><span>Bugünkü hedef</span><strong id="dashTodayTarget">₺0</strong></div>
+  <div class="stat"><span>Hedef gerçekleşme</span><strong id="dashTodayRate">-%</strong></div>
+  <div class="stat"><span>Ayın toplam cirosu</span><strong id="dashMonthRevenue">₺0</strong></div>
+  <div class="stat"><span>En yüksek cirolu personel</span><strong id="dashBest" style="font-size:17px">Henüz yok</strong></div>
+ </div>
+ <div class="notice" id="dashBestDetail">Personel satış kaydı girildiğinde en yüksek performans burada gösterilecek.</div>
+ <div class="tablewrap"><table><thead><tr><th>Ürün grubu</th><th>Bugünkü toplam</th><th>Aylık toplam</th></tr></thead><tbody id="dashProductTotals"></tbody></table></div>
+</section>
+
+<section class="stats">
+ <div class="stat"><span>Kontrol tamamlandı</span><strong id="doneCount">0 / 0</strong></div>
+ <div class="stat"><span>Eksik kontrol</span><strong id="leftCount">0</strong></div>
+ <div class="stat"><span>Yaklaşan SKT</span><strong id="expiryCount">0</strong></div>
+ <div class="stat"><span>Azalan stok</span><strong id="lowCount">0</strong></div>
+</section>
+<nav class="tabs">
+ <button class="active" data-tab="checks">Günlük kontroller</button>
+ <button data-tab="expiry">SKT takibi</button>
+ <button data-tab="stock">Stok takibi</button>
+ <button data-tab="staff">Personel performansı</button>
+ <button data-tab="reports">Yönetim raporları</button>
+ <button data-tab="history">Geçmiş kayıtlar</button>
+</nav>
+<section id="checks" class="panel">
+ <h2>Günlük kontrol listesi</h2><p class="sub">Kontrol ettiğiniz maddeleri işaretleyin. İşaretler bu cihazdaki tarayıcıda saklanır.</p>
+ <div class="formgrid" style="grid-template-columns:1fr auto">
+  <input id="newCheck" placeholder="Yeni kontrol maddesi yazın">
+  <button class="primary" id="addCheck">Madde ekle</button>
+ </div>
+ <div id="checkList"></div>
+ <div style="margin-top:14px">
+  <label for="responsible" class="sub">Kontrolü yapan kişi</label>
+  <input id="responsible" placeholder="Ad soyad">
+  <label for="dailyNotes" class="sub" style="display:block;margin-top:10px">Günlük açıklama / yapılan işlemler</label>
+  <textarea id="dailyNotes" rows="4" placeholder="Yapılan işlemleri, eksikleri ve açıklamaları yazın..."></textarea>
+ </div>
+ <div class="actions"><button class="secondary" id="resetChecks">Bugünkü işaretleri sıfırla</button><button class="primary" id="saveChecks">Bugünkü kontrolü kaydet</button><button class="primary" id="makeReport">A4 rapor / PDF oluştur</button></div>
+ <div id="checkMsg" class="sub" aria-live="polite"></div>
+</section>
+<section id="expiry" class="panel hidden">
+ <h2>SKT takip listesi</h2><p class="sub">Ürünleri ve son tüketim tarihlerini ekleyin. Tarihi yaklaşan ürünler uyarıyla gösterilir.</p>
+ <div class="formgrid">
+  <input id="expName" placeholder="Ürün adı"><input id="expDate" type="date" aria-label="Son tüketim tarihi">
+  <input id="expQty" placeholder="Miktar (örn. 2 kg)"><button class="primary" id="addExpiry">Ürün ekle</button>
+ </div>
+ <div id="expiryNotice"></div><div class="tablewrap"><table><thead><tr><th>Ürün</th><th>SKT</th><th>Miktar</th><th>Durum</th><th></th></tr></thead><tbody id="expiryRows"></tbody></table></div>
+</section>
+<section id="stock" class="panel hidden">
+ <h2>Stok takip listesi</h2><p class="sub">Mevcut miktarı ve minimum stok seviyesini girin.</p>
+ <div class="formgrid">
+  <input id="stockName" placeholder="Ürün adı"><input id="stockQty" type="number" min="0" step="any" placeholder="Mevcut miktar">
+  <input id="stockMin" type="number" min="0" step="any" placeholder="Minimum miktar"><button class="primary" id="addStock">Stok ekle</button>
+ </div>
+ <div id="stockNotice"></div><div class="tablewrap"><table><thead><tr><th>Ürün</th><th>Mevcut</th><th>Minimum</th><th>Durum</th><th></th></tr></thead><tbody id="stockRows"></tbody></table></div>
+</section>
+
+<section id="staff" class="panel hidden">
+ <h2>Personel performans ve satış kayıtları</h2>
+ <p class="sub">Her personelin günlük ürün satışlarını ve cirosunu kaydedin. Kayıtlar tarih bazında bu cihazda saklanır.</p>
+ <div class="formgrid">
+  <input id="staffDate" type="date" aria-label="Kayıt tarihi">
+  <input id="staffName" placeholder="Personel ismi">
+  <input id="staffStart" type="number" min="0" step="1" placeholder="Başlangıç adedi">
+  <input id="staffKStart" type="number" min="0" step="1" placeholder="K. Başlangıç adedi">
+  <input id="staffSoup" type="number" min="0" step="1" placeholder="Çorba adedi">
+  <input id="staffDessert" type="number" min="0" step="1" placeholder="Tatlı adedi">
+  <input id="staffDrink" type="number" min="0" step="1" placeholder="Ferahlatan içecek adedi">
+  <input id="staffRevenue" type="number" min="0" step="0.01" placeholder="Genel ciro (₺)">
+  <input id="staffTarget" type="number" min="0" step="0.01" placeholder="Hedef (₺)">
+  <button class="primary" id="saveStaff">Personel satışını kaydet</button>
+ </div>
+ <div class="notice">Aynı personel ve aynı tarih için yeniden kayıt girersen mevcut kayıt güncellenir.</div>
+ <h3>Satış kayıtları</h3>
+ <div class="formgrid" style="grid-template-columns:1fr 1fr">
+  <input id="staffFilterDate" type="date" aria-label="Tarihe göre filtrele">
+  <input id="staffFilterName" placeholder="Personel adına göre ara">
+ </div>
+ <div id="staffSummary" class="stats" style="grid-template-columns:repeat(3,1fr)"></div>
+ <div class="tablewrap"><table><thead><tr><th>Sıra</th><th>Tarih</th><th>Personel</th><th>Başlangıç</th><th>K.Baş.</th><th>Çorba</th><th>Tatlı</th><th>İçecek</th><th>Ciro</th><th>Hedef</th><th>Gerç.</th><th></th></tr></thead><tbody id="staffRows"></tbody></table></div>
+ <div class="actions">
+  <button class="primary" id="staffImportBtn">Excel dosyasından aktar (.xlsx / .xls / .csv)</button>
+  <button class="secondary" id="staffTemplate">Örnek Excel şablonunu indir</button>
+  <button class="secondary" id="staffExport">Personel kayıtlarını CSV indir</button>
+  <input id="staffImportFile" type="file" accept=".xlsx,.xls,.csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel,text/csv" style="display:none">
+ </div>
+ <div class="notice">Excel dosyanı doğrudan <b>.xlsx</b>, <b>.xls</b> veya <b>.csv</b> biçiminde seçebilirsin. Sütunlar: Tarih, Personel, Başlangıç, K.Başlangıç, Çorba, Tatlı, Ferahlatan içecek, Genel ciro, Hedef. Aynı tarih ve personel varsa mevcut kayıt güncellenir.</div>
+ <div id="staffImportMsg" class="sub" aria-live="polite"></div>
+</section>
+<section id="reports" class="panel hidden">
+ <h2>Günlük · Haftalık · Aylık yönetim raporları</h2>
+ <p class="sub">Seçtiğin tarih aralığındaki personel satışlarını ve ürün toplamlarını otomatik hesaplar.</p>
+ <div class="actions">
+  <button class="secondary" id="reportToday">Bugün</button>
+  <button class="secondary" id="reportWeek">Bu hafta</button>
+  <button class="secondary" id="reportMonth">Bu ay</button>
+ </div>
+ <div class="formgrid" style="grid-template-columns:1fr 1fr">
+  <label>Başlangıç tarihi<input id="reportFrom" type="date"></label>
+  <label>Bitiş tarihi<input id="reportTo" type="date"></label>
+ </div>
+ <div class="actions"><button class="primary" id="runReport">Raporu oluştur</button><button class="secondary" id="printSalesReport">Raporu yazdır / PDF</button><button class="secondary" id="exportSalesReport">Raporu Excel uyumlu indir</button></div>
+ <div id="salesReportPanel" style="margin-top:16px"><div class="empty">Bir tarih aralığı seçip raporu oluştur.</div></div>
+</section>
+
+<section id="printReport" class="panel hidden"></section>
+<section id="history" class="panel hidden">
+ <h2>Geçmiş günlük kayıtlar</h2>
+ <p class="sub">Kaydettiğiniz eski günleri seçin; kontrol sonuçlarını, açıklamaları, o günkü SKT ve stok durumunu görüntüleyin.</p>
+ <div class="formgrid" style="grid-template-columns:1fr auto">
+  <select id="historyDate" aria-label="Geçmiş kayıt tarihi"><option value="">Kayıtlı gün seçin</option></select>
+  <button class="primary" id="viewHistory">Kaydı görüntüle</button>
+ </div>
+ <div id="historyList"></div>
+ <div id="historyDetail"></div>
+</section>
+<footer><b>Gizlilik ve kullanım:</b> Bu deneme sürümü verileri yalnızca açıldığı cihazın/tarayıcının yerel hafızasında tutar. İnternet bağlantısı olsa bile hiçbir veriyi sunucuya göndermez ve cihazlar arasında otomatik eşitleme yapmaz. Yedek dosyasıyla elle taşıma mümkündür. Cihazlar arası ortak kullanım henüz etkin değildir. Gerçek şirket/personel/ciro verilerini şirket onayı ve onaylı altyapı olmadan girmeyin. Gıda güvenliği kontrollerinde işletmenizin resmî prosedürlerini esas alın.</footer>
+</main>
+<script>
+const defaultChecks=["Pişirme alanındaki ürünlerin SKT kontrolü","Dolap sıcaklıklarının kontrolü","Çorbaların sıcaklık ve durum kontrolü","Peçete, sıvı sabun ve dezenfektan kontrolü","Mutfak ve servis alanı temizlik kontrolü","Ekipman ve çalışma alanı kontrolü","Soğuk oda ve depolama düzeni kontrolü","Personel hijyen ve kıyafet kontrolü","Açılış hazırlıklarının tamamlanması","Kapanış temizliği ve ekipman kontrolü"];
+const key='restaurant-manager-v1';
+let data=JSON.parse(localStorage.getItem(key)||'{}');
+data.checks=data.checks||{};data.expiry=data.expiry||[];data.stock=data.stock||[];
+data.checkItems=Array.isArray(data.checkItems)?data.checkItems:defaultChecks.slice();
+data.dailyInfo=data.dailyInfo||{};data.history=data.history||{};data.staff=Array.isArray(data.staff)?data.staff:[];
+const today=()=>{const d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;};
+function persist(){localStorage.setItem(key,JSON.stringify(data));render();}
+function daysUntil(date){return Math.ceil((new Date(date+'T00:00:00')-new Date(today()+'T00:00:00'))/86400000);}
+function renderChecks(){
+ const info=data.dailyInfo[today()]||{};
+ document.getElementById('responsible').value=info.responsible||'';
+ document.getElementById('dailyNotes').value=info.notes||'';
+ const list=document.getElementById('checkList');
+ list.innerHTML=data.checkItems.map((item,i)=>`<div class="row"><label><input type="checkbox" data-check="${i}" ${data.checks[today()]?.[i]?'checked':''}><span>${esc(item)}</span></label><button class="secondary" type="button" data-remove-check="${i}" aria-label="Bu maddeyi sil">Sil</button></div>`).join('') || '<div class="empty">Henüz kontrol maddesi yok. Yukarıdan yeni madde ekleyebilirsiniz.</div>';
+ list.querySelectorAll('input[type=checkbox]').forEach(el=>el.addEventListener('change',()=>{data.checks[today()]=data.checks[today()]||{};data.checks[today()][el.dataset.check]=el.checked;localStorage.setItem(key,JSON.stringify(data));renderStats();}));
+ list.querySelectorAll('[data-remove-check]').forEach(el=>el.addEventListener('click',()=>{const i=Number(el.dataset.removeCheck);if(confirm('Bu kontrol maddesini listeden silmek istiyor musunuz?')){data.checkItems.splice(i,1);data.checks={};persist();}}));
+}
+function renderExpiry(){
+ const rows=document.getElementById('expiryRows');
+ rows.innerHTML=data.expiry.length?data.expiry.map((x,i)=>{let d=daysUntil(x.date),status=d<0?'Tarihi geçmiş':d===0?'Bugün':d<=3?`${d} gün kaldı`:'Normal';return `<tr><td>${esc(x.name)}</td><td>${x.date}</td><td>${esc(x.qty||'-')}</td><td>${status}</td><td><button class="secondary" onclick="removeItem('expiry',${i})">Sil</button></td></tr>`}).join(''):'<tr><td colspan="5" class="empty">Henüz ürün eklenmedi.</td></tr>';
+ const urgent=data.expiry.filter(x=>daysUntil(x.date)<=3).length;
+ document.getElementById('expiryNotice').innerHTML=urgent?`<div class="notice danger">${urgent} ürünün SKT tarihi geçmiş veya 3 gün içinde doluyor. Ürünleri kontrol edin ve işletme prosedürünü uygulayın.</div>`:'';
+}
+function renderStock(){
+ document.getElementById('stockRows').innerHTML=data.stock.length?data.stock.map((x,i)=>{let low=Number(x.qty)<=Number(x.min);return `<tr><td>${esc(x.name)}</td><td>${x.qty}</td><td>${x.min}</td><td>${low?'Minimum seviyede / altında':'Yeterli'}</td><td><button class="secondary" onclick="removeItem('stock',${i})">Sil</button></td></tr>`}).join(''):'<tr><td colspan="5" class="empty">Henüz stok eklenmedi.</td></tr>';
+ const low=data.stock.filter(x=>Number(x.qty)<=Number(x.min)).length;
+ document.getElementById('stockNotice').innerHTML=low?`<div class="notice">${low} ürün minimum stok seviyesinde veya altında. Sipariş ihtiyacını kontrol edin.</div>`:'';
+}
+function renderStats(){
+ const done=Object.values(data.checks[today()]||{}).filter(Boolean).length;
+ document.getElementById('doneCount').textContent=`${done} / ${data.checkItems.length}`;
+ document.getElementById('leftCount').textContent=Math.max(0,data.checkItems.length-done);
+ document.getElementById('expiryCount').textContent=data.expiry.filter(x=>daysUntil(x.date)<=3).length;
+ document.getElementById('lowCount').textContent=data.stock.filter(x=>Number(x.qty)<=Number(x.min)).length;
+}
+function render(){renderChecks();renderExpiry();renderStock();renderStats();if(typeof renderDashboard==='function')renderDashboard();}
+function esc(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+window.removeItem=(type,i)=>{if(confirm('Bu kaydı silmek istiyor musunuz?')){data[type].splice(i,1);persist();}};
+document.querySelectorAll('[data-tab]').forEach(b=>b.addEventListener('click',()=>{document.querySelectorAll('[data-tab]').forEach(x=>x.classList.toggle('active',x===b));['checks','expiry','stock','staff','reports','history'].forEach(id=>document.getElementById(id).classList.toggle('hidden',id!==b.dataset.tab));if(b.dataset.tab==='history')renderHistory();if(b.dataset.tab==='staff')renderStaff();if(b.dataset.tab==='reports')renderSalesReport();}));
+document.getElementById('addExpiry').onclick=()=>{let name=expName.value.trim(),date=expDate.value;if(!name||!date){alert('Ürün adı ve SKT girin.');return;}data.expiry.push({name,date,qty:expQty.value.trim()});expName.value='';expDate.value='';expQty.value='';persist();};
+document.getElementById('addStock').onclick=()=>{let name=stockName.value.trim(),qty=stockQty.value,min=stockMin.value;if(!name||qty===''||min===''){alert('Ürün adı, mevcut miktar ve minimum miktarı girin.');return;}data.stock.push({name,qty,min});stockName.value='';stockQty.value='';stockMin.value='';persist();};
+document.getElementById('addCheck').onclick=()=>{const input=document.getElementById('newCheck');const value=input.value.trim();if(!value){alert('Lütfen bir kontrol maddesi yazın.');return;}if(data.checkItems.some(x=>x.toLocaleLowerCase('tr-TR')===value.toLocaleLowerCase('tr-TR'))){alert('Bu madde zaten listede var.');return;}data.checkItems.push(value);input.value='';persist();};
+document.getElementById('newCheck').addEventListener('keydown',e=>{if(e.key==='Enter')document.getElementById('addCheck').click();});
+document.getElementById('resetChecks').onclick=()=>{if(confirm('Bugünkü işaretleri sıfırlamak istiyor musunuz?')){delete data.checks[today()];persist();}};
+function snapshotToday(){
+ const date=today();
+ const info={responsible:document.getElementById('responsible').value.trim(),notes:document.getElementById('dailyNotes').value.trim()};
+ data.dailyInfo[date]=info;
+ data.history[date]={
+  date,savedAt:new Date().toISOString(),responsible:info.responsible,notes:info.notes,
+  checks:data.checkItems.map((name,i)=>({name,ok:!!data.checks[date]?.[i]})),
+  expiry:data.expiry.map(x=>({...x})),stock:data.stock.map(x=>({...x}))
+ };
+ localStorage.setItem(key,JSON.stringify(data));
+}
+function saveDailyInfo(){snapshotToday();}
+function fmtDate(date){return date?date.split('-').reverse().join('.'):'-';}
+function renderHistory(){
+ const dates=Object.keys(data.history||{}).sort((a,b)=>b.localeCompare(a));
+ const select=document.getElementById('historyDate'),old=select.value;
+ select.innerHTML='<option value="">Kayıtlı gün seçin</option>'+dates.map(d=>`<option value="${d}">${fmtDate(d)}</option>`).join('');
+ if(dates.includes(old))select.value=old;
+ const list=document.getElementById('historyList');
+ list.innerHTML=dates.length?`<div class="tablewrap"><table><thead><tr><th>Tarih</th><th>Kontrolü yapan</th><th>Tamamlanan</th><th>Eksik</th><th></th></tr></thead><tbody>${dates.map(d=>{const h=data.history[d],done=(h.checks||[]).filter(x=>x.ok).length,total=(h.checks||[]).length;return `<tr><td>${fmtDate(d)}</td><td>${esc(h.responsible||'Belirtilmedi')}</td><td>${done}/${total}</td><td>${total-done}</td><td><button class="secondary" data-open-history="${d}">Görüntüle</button></td></tr>`}).join('')}</tbody></table></div>`:'<div class="empty">Henüz geçmiş kaydı yok. Günlük kontrolü tamamladıktan sonra “Bugünkü kontrolü kaydet” düğmesine basın.</div>';
+ list.querySelectorAll('[data-open-history]').forEach(btn=>btn.addEventListener('click',()=>{select.value=btn.dataset.openHistory;showHistory(btn.dataset.openHistory);}));
+}
+function showHistory(date){
+ const h=data.history[date],detail=document.getElementById('historyDetail');
+ if(!h){detail.innerHTML='<div class="empty">Bu tarihe ait kayıt bulunamadı.</div>';return;}
+ const checks=h.checks||[],done=checks.filter(x=>x.ok).length,missing=checks.length-done;
+ detail.innerHTML=`<div class="panel" style="margin-top:14px;background:#fff9fc">
+  <h2>${fmtDate(date)} tarihli kayıt</h2>
+  <p class="sub">Kontrolü yapan: <b>${esc(h.responsible||'Belirtilmedi')}</b> · Kaydedilme: ${h.savedAt?new Date(h.savedAt).toLocaleString('tr-TR'):'-'}</p>
+  <div class="stats" style="grid-template-columns:repeat(3,1fr)">
+   <div class="stat"><span>Tamamlandı</span><strong>${done}</strong></div><div class="stat"><span>Eksik</span><strong>${missing}</strong></div><div class="stat"><span>Toplam</span><strong>${checks.length}</strong></div>
+  </div>
+  <h3>Kontrol maddeleri</h3><div class="tablewrap"><table><thead><tr><th>Kontrol</th><th>Durum</th></tr></thead><tbody>${checks.map(x=>`<tr><td>${esc(x.name)}</td><td>${x.ok?'Tamamlandı':'Eksik'}</td></tr>`).join('')||'<tr><td colspan="2">Kayıt yok</td></tr>'}</tbody></table></div>
+  <h3 style="margin-top:16px">Günlük açıklamalar</h3><div class="notes">${esc(h.notes||'Açıklama girilmedi.').replace(/\n/g,'<br>')}</div>
+  <h3 style="margin-top:16px">O günün SKT kayıtları</h3><div class="tablewrap"><table><thead><tr><th>Ürün</th><th>SKT</th><th>Miktar</th></tr></thead><tbody>${(h.expiry||[]).map(x=>`<tr><td>${esc(x.name)}</td><td>${esc(x.date)}</td><td>${esc(x.qty||'-')}</td></tr>`).join('')||'<tr><td colspan="3">Kayıt yok</td></tr>'}</tbody></table></div>
+  <h3 style="margin-top:16px">O günün stok durumu</h3><div class="tablewrap"><table><thead><tr><th>Ürün</th><th>Mevcut</th><th>Minimum</th><th>Durum</th></tr></thead><tbody>${(h.stock||[]).map(x=>`<tr><td>${esc(x.name)}</td><td>${esc(x.qty)}</td><td>${esc(x.min)}</td><td>${Number(x.qty)<=Number(x.min)?'Minimum seviyede / altında':'Yeterli'}</td></tr>`).join('')||'<tr><td colspan="4">Kayıt yok</td></tr>'}</tbody></table></div>
+  <div class="actions"><button class="primary" id="printOldReport">Bu günün A4 raporunu oluştur</button></div>
+ </div>`;
+ document.getElementById('printOldReport').onclick=()=>makeReport(h);
+}
+function makeReport(h){
+ const date=h.date||today(),checks=h.checks||[],done=checks.filter(x=>x.ok).length,missing=checks.length-done;
+ const expRows=(h.expiry||[]).map(x=>{const d=daysUntil(x.date);return `<tr><td>${esc(x.name)}</td><td>${esc(x.date)}</td><td>${esc(x.qty||'-')}</td><td>${d<0?'Tarihi geçmiş':d===0?'Bugün':d+' gün kaldı'}</td></tr>`}).join('');
+ const stockRows=(h.stock||[]).map(x=>`<tr><td>${esc(x.name)}</td><td>${esc(x.qty)}</td><td>${esc(x.min)}</td><td>${Number(x.qty)<=Number(x.min)?'Sipariş kontrolü gerekli':'Yeterli'}</td></tr>`).join('');
+ const report=document.getElementById('printReport');
+ report.innerHTML=`<div class="report-head"><h1>TAVUK DÜNYASI · RESTORAN GÜNLÜK RAPORU</h1><p>GÜNLÜK OPERASYON VE KONTROL FORMU</p></div>
+ <div class="report-meta"><span><b>Tarih:</b> ${fmtDate(date)}</span><span><b>Kontrolü yapan:</b> ${esc(h.responsible||'Belirtilmedi')}</span></div>
+ <h3>1. Günlük kontroller</h3><table><thead><tr><th>Kontrol maddesi</th><th>Durum</th></tr></thead><tbody>${checks.map(x=>`<tr><td>${esc(x.name)}</td><td>${x.ok?'Tamamlandı':'Eksik'}</td></tr>`).join('')||'<tr><td colspan="2">Kontrol maddesi bulunmuyor.</td></tr>'}</tbody></table>
+ <p><b>Özet:</b> ${done} tamamlandı · ${missing} eksik · Toplam ${checks.length} madde</p>
+ <h3>2. Günlük açıklamalar ve yapılan işlemler</h3><div class="notes">${esc(h.notes||'Açıklama girilmedi.').replace(/\n/g,'<br>')}</div>
+ <h3>3. SKT takip kayıtları</h3><table><thead><tr><th>Ürün</th><th>SKT</th><th>Miktar</th><th>Durum</th></tr></thead><tbody>${expRows||'<tr><td colspan="4">SKT kaydı yok.</td></tr>'}</tbody></table>
+ <h3>4. Stok durumu</h3><table><thead><tr><th>Ürün</th><th>Mevcut</th><th>Minimum</th><th>Durum</th></tr></thead><tbody>${stockRows||'<tr><td colspan="4">Stok kaydı yok.</td></tr>'}</tbody></table>
+ <div class="signatures"><div>Kontrolü yapan imza</div><div>Müdür imza</div></div>
+ <p class="report-foot">Bu rapor, seçilen tarihte kaydedilmiş günlük kayıtlar esas alınarak oluşturulmuştur.</p>`;
+ report.classList.remove('hidden');window.print();
+}
+document.getElementById('viewHistory').onclick=()=>{const d=document.getElementById('historyDate').value;if(!d){alert('Lütfen görüntülemek için bir tarih seçin.');return;}showHistory(d);};
+document.getElementById('makeReport').onclick=()=>{snapshotToday();makeReport(data.history[today()]);};
+document.getElementById('saveChecks').onclick=()=>{snapshotToday();document.getElementById('checkMsg').textContent='Bugünkü kontrol, açıklamalar, SKT ve stok durumu bu cihazda geçmiş kaydı olarak saklandı.';};
+
+// Yerel yedekleme: dosya kullanıcı cihazında oluşturulur; hiçbir sunucuya gönderilmez.
+document.getElementById('backupExport').addEventListener('click',()=>{
+ const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+ const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='akilli-restoran-yedek-'+today()+'.json';a.click();URL.revokeObjectURL(url);
+});
+document.getElementById('backupImportBtn').addEventListener('click',()=>document.getElementById('backupFile').click());
+document.getElementById('backupFile').addEventListener('change',e=>{
+ const file=e.target.files[0];if(!file)return;const reader=new FileReader();
+ reader.onload=()=>{try{const incoming=JSON.parse(reader.result);if(!incoming||!Array.isArray(incoming.checkItems)||!incoming.checks||!Array.isArray(incoming.expiry)||!Array.isArray(incoming.stock)||!incoming.history)throw new Error('Geçersiz yedek');if(confirm('Bu cihazdaki mevcut kayıtlar, seçtiğiniz yedekle değiştirilsin mi?')){data=incoming;persist();alert('Yedek bu cihaza geri yüklendi.');}}catch(err){alert('Dosya geçerli bir Akıllı Restoran yedeği değil.');}e.target.value='';};reader.readAsText(file);
+});
+
+
+function money(v){return Number(v||0).toLocaleString('tr-TR',{style:'currency',currency:'TRY',maximumFractionDigits:2});}
+
+function renderDashboard(){
+ const t=today(), month=t.slice(0,7);
+ const todayRows=data.staff.filter(x=>x.date===t);
+ const monthRows=data.staff.filter(x=>x.date&&x.date.slice(0,7)===month);
+ const sum=(rows,k)=>rows.reduce((a,x)=>a+Number(x[k]||0),0);
+ const rev=sum(todayRows,'revenue'),target=sum(todayRows,'target'),monthRev=sum(monthRows,'revenue');
+ const units=rows=>rows.reduce((a,x)=>a+['start','kstart','soup','dessert','drink'].reduce((n,k)=>n+Number(x[k]||0),0),0);
+ const best=[...todayRows].sort((a,b)=>Number(b.revenue)-Number(a.revenue))[0];
+ document.getElementById('dashTodayRevenue').textContent=money(rev);
+ document.getElementById('dashTodayUnits').textContent=units(todayRows).toLocaleString('tr-TR');
+ document.getElementById('dashTodayTarget').textContent=money(target);
+ document.getElementById('dashTodayRate').textContent=target>0?Math.round(rev/target*100)+'%':'-%';
+ document.getElementById('dashMonthRevenue').textContent=money(monthRev);
+ document.getElementById('dashBest').textContent=best?best.name:'Henüz yok';
+ document.getElementById('dashBestDetail').textContent=best?`Bugünün en yüksek cirosu: ${best.name} · ${money(best.revenue)} · Hedef gerçekleşme: ${best.target>0?Math.round(best.revenue/best.target*100)+'%':'Hedef girilmemiş'}`:'Bugün henüz personel satış kaydı girilmedi.';
+ const labels=[['Başlangıç','start'],['K. Başlangıç','kstart'],['Çorba','soup'],['Tatlı','dessert'],['Ferahlatan içecek','drink']];
+ document.getElementById('dashProductTotals').innerHTML=labels.map(([label,key])=>`<tr><td>${label}</td><td>${sum(todayRows,key)}</td><td>${sum(monthRows,key)}</td></tr>`).join('');
+}
+function renderStaff(){
+ const date=document.getElementById('staffFilterDate').value;
+ const name=document.getElementById('staffFilterName').value.trim().toLocaleLowerCase('tr-TR');
+ const rows=data.staff.filter(x=>(!date||x.date===date)&&(!name||x.name.toLocaleLowerCase('tr-TR').includes(name))).sort((a,b)=>b.date.localeCompare(a.date)||Number(b.revenue)-Number(a.revenue));
+ const totalRevenue=rows.reduce((s,x)=>s+Number(x.revenue||0),0), totalTarget=rows.reduce((s,x)=>s+Number(x.target||0),0);
+ const totalPlates=rows.reduce((s,x)=>s+['start','kstart','soup','dessert','drink'].reduce((n,k)=>n+Number(x[k]||0),0),0);
+ document.getElementById('staffSummary').innerHTML=`<div class="stat"><span>Toplam ciro</span><strong>${money(totalRevenue)}</strong></div><div class="stat"><span>Toplam hedef</span><strong>${money(totalTarget)}</strong></div><div class="stat"><span>Ürün adedi</span><strong>${totalPlates}</strong></div>`;
+ document.getElementById('staffRows').innerHTML=rows.length?rows.map((x,i)=>`<tr><td>${i+1}</td><td>${fmtDate(x.date)}</td><td>${esc(x.name)}</td><td>${x.start}</td><td>${x.kstart}</td><td>${x.soup}</td><td>${x.dessert}</td><td>${x.drink}</td><td>${money(x.revenue)}</td><td>${money(x.target)}</td><td>${x.target>0?Math.round(x.revenue/x.target*100)+'%':'-'}</td><td><button class="secondary" onclick="deleteStaff('${x.id}')">Sil</button></td></tr>`).join(''):'<tr><td colspan="12" class="empty">Henüz personel satış kaydı yok.</td></tr>';
+}
+window.deleteStaff=id=>{if(confirm('Bu personel satış kaydını silmek istiyor musunuz?')){data.staff=data.staff.filter(x=>x.id!==id);persist();renderStaff();}};
+document.getElementById('saveStaff').onclick=()=>{
+ const date=document.getElementById('staffDate').value||today(),name=document.getElementById('staffName').value.trim();
+ if(!name){alert('Personel ismini girin.');return;}
+ const val=id=>Number(document.getElementById(id).value||0);
+ const record={id:date+'_'+name.toLocaleLowerCase('tr-TR'),date,name,start:val('staffStart'),kstart:val('staffKStart'),soup:val('staffSoup'),dessert:val('staffDessert'),drink:val('staffDrink'),revenue:val('staffRevenue'),target:val('staffTarget')};
+ const ix=data.staff.findIndex(x=>x.id===record.id);
+ if(ix>=0)data.staff[ix]=record;else data.staff.push(record);
+ ['staffName','staffStart','staffKStart','staffSoup','staffDessert','staffDrink','staffRevenue','staffTarget'].forEach(id=>document.getElementById(id).value='');
+ persist();renderStaff();alert('Personel satış kaydı bu cihaza kaydedildi.');
+};
+
+function parseCSV(text){
+ const rows=[];let row=[],field='',quoted=false;
+ for(let i=0;i<text.length;i++){const c=text[i],n=text[i+1];if(c==='"'&&quoted&&n==='"'){field+='"';i++;}else if(c==='"'){quoted=!quoted;}else if((c===';'||c===',')&&!quoted){row.push(field);field='';}else if((c==='\n'||c==='\r')&&!quoted){if(c==='\r'&&n==='\n')i++;row.push(field);if(row.some(v=>v.trim()!==''))rows.push(row);row=[];field='';}else field+=c;}
+ row.push(field);if(row.some(v=>v.trim()!==''))rows.push(row);return rows;
+}
+function normHead(v){return String(v||'').trim().toLocaleLowerCase('tr-TR').normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/ı/g,'i').replace(/[^a-z0-9]/g,'');}
+function parseNum(v){let x=String(v??'').trim().replace(/₺/g,'').replace(/\s/g,'');if(!x)return 0;if(x.includes(',')&&x.includes('.'))x=x.lastIndexOf(',')>x.lastIndexOf('.')?x.replace(/\./g,'').replace(',','.'):x.replace(/,/g,'');else if(x.includes(','))x=x.replace(',','.');const n=Number(x);return Number.isFinite(n)?n:0;}
+document.getElementById('staffImportBtn').onclick=()=>document.getElementById('staffImportFile').click();
+document.getElementById('staffTemplate').onclick=()=>{const rows=[['Tarih','Personel','Başlangıç','K.Başlangıç','Çorba','Tatlı','Ferahlatan içecek','Genel ciro','Hedef'],[today(),'Örnek Personel',10,2,3,1,5,1250.50,1500]];if(window.XLSX){const ws=XLSX.utils.aoa_to_sheet(rows);const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,'Personel Satışları');XLSX.writeFile(wb,'personel-satis-sablonu.xlsx');}else{const csv='\ufeff'+rows.map(r=>r.map(v=>'"'+String(v).replace(/"/g,'""')+'"').join(';')).join('\r\n');const a=document.createElement('a'),u=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));a.href=u;a.download='personel-satis-sablonu.csv';a.click();URL.revokeObjectURL(u);alert('Excel kütüphanesi yüklenemedi; CSV şablonu indirildi.');}};
+document.getElementById('staffImportFile').addEventListener('change',e=>{const file=e.target.files[0];if(!file)return;const isExcel=/\.xlsx?$/i.test(file.name);if(isExcel&&!window.XLSX){alert('Excel dosyasını okuyabilmek için internet bağlantısı gerekli. Sayfayı yenileyip tekrar deneyin veya CSV dosyası seçin.');e.target.value='';return;}const reader=new FileReader();reader.onload=()=>{try{let rows;if(isExcel){const wb=XLSX.read(reader.result,{type:'array',cellDates:true});const ws=wb.Sheets[wb.SheetNames[0]];rows=XLSX.utils.sheet_to_json(ws,{header:1,raw:false,defval:''});}else{rows=parseCSV(String(reader.result||'').replace(/^\uFEFF/,''));}if(rows.length<2)throw new Error('Dosyada aktarılacak satır yok.');const headers=rows[0].map(normHead);const aliases={date:['tarih','satis tarihi'],name:['personel','personel adi','adsoyad'],start:['baslangic','baslangic adedi'],kstart:['kbaslangic','kbaslangic adedi'],soup:['corba','corba adedi'],dessert:['tatli','tatli adedi'],drink:['ferahlatanicecek','icecek','icecek adedi'],revenue:['genelciro','ciro','toplamciro'],target:['hedef','cirohedefi']};const ix={};for(const [key,names] of Object.entries(aliases))ix[key]=headers.findIndex(h=>names.map(normHead).includes(h));if(ix.date<0||ix.name<0)throw new Error('Tarih ve Personel sütunları zorunludur. Şablonu kullanabilirsin.');let added=0,updated=0,skipped=0;for(const r of rows.slice(1)){const rawDate=String(r[ix.date]||'').trim();let date=rawDate;if(/^\d{1,2}[./-]\d{1,2}[./-]\d{4}$/.test(date)){const p=date.split(/[./-]/);date=p[2]+'-'+p[1].padStart(2,'0')+'-'+p[0].padStart(2,'0');}else if(/^\d{4}\.\d{1,2}\.\d{1,2}$/.test(date))date=date.replace(/\./g,'-');const name=String(r[ix.name]||'').trim();if(!/^\d{4}-\d{2}-\d{2}$/.test(date)||!name){skipped++;continue;}const rec={id:date+'_'+name.toLocaleLowerCase('tr-TR'),date,name};for(const k of ['start','kstart','soup','dessert','drink','revenue','target'])rec[k]=ix[k]>=0?parseNum(r[ix[k]]):0;const old=data.staff.findIndex(x=>x.id===rec.id||(x.date===date&&String(x.name).toLocaleLowerCase('tr-TR')===name.toLocaleLowerCase('tr-TR')));if(old>=0){data.staff[old]={...data.staff[old],...rec};updated++;}else{data.staff.push(rec);added++;}}if(!added&&!updated)throw new Error('Geçerli kayıt bulunamadı. Tarihleri YYYY-AA-GG veya GG.AA.YYYY biçiminde yaz.');persist();renderStaff();document.getElementById('staffImportMsg').textContent=`Aktarım tamamlandı: ${added} yeni kayıt, ${updated} güncellenen kayıt, ${skipped} atlanan satır.`;alert(document.getElementById('staffImportMsg').textContent);}catch(err){alert('Aktarım yapılamadı: '+err.message);}e.target.value='';};if(isExcel)reader.readAsArrayBuffer(file);else reader.readAsText(file,'UTF-8');});
+
+['staffFilterDate','staffFilterName'].forEach(id=>document.getElementById(id).addEventListener('input',renderStaff));
+document.getElementById('staffDate').value=today();
+document.getElementById('staffFilterDate').value='';
+document.getElementById('staffExport').onclick=()=>{
+ const headers=['Tarih','Personel','Başlangıç','K.Başlangıç','Çorba','Tatlı','Ferahlatan içecek','Genel ciro','Hedef'];
+ const lines=[headers,...data.staff.map(x=>[x.date,x.name,x.start,x.kstart,x.soup,x.dessert,x.drink,x.revenue,x.target])];
+ const csv='\ufeff'+lines.map(r=>r.map(v=>'"'+String(v??'').replace(/"/g,'""')+'"').join(';')).join('\n');
+ const a=document.createElement('a'),url=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));a.href=url;a.download='personel-satislari.csv';a.click();URL.revokeObjectURL(url);
+};
+
+
+function dateOnly(d){return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;}
+function setReportRange(kind){const now=new Date();let from,to=dateOnly(now);if(kind==='day')from=to;else if(kind==='week'){const day=(now.getDay()+6)%7;const start=new Date(now);start.setDate(now.getDate()-day);from=dateOnly(start);}else{from=`${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-01`;}document.getElementById('reportFrom').value=from;document.getElementById('reportTo').value=to;renderSalesReport();}
+function renderSalesReport(){
+ const from=document.getElementById('reportFrom').value,to=document.getElementById('reportTo').value;
+ const panel=document.getElementById('salesReportPanel');
+ if(!from||!to){panel.innerHTML='<div class="notice">Başlangıç ve bitiş tarihlerini seç.</div>';return;}
+ if(from>to){panel.innerHTML='<div class="notice danger">Başlangıç tarihi bitiş tarihinden sonra olamaz.</div>';return;}
+ const rows=data.staff.filter(x=>x.date>=from&&x.date<=to);
+ const keys=['start','kstart','soup','dessert','drink'];
+ const sum=(arr,k)=>arr.reduce((a,x)=>a+Number(x[k]||0),0);
+ const totalRev=sum(rows,'revenue'),totalTarget=sum(rows,'target'),totalUnits=rows.reduce((a,x)=>a+keys.reduce((n,k)=>n+Number(x[k]||0),0),0);
+ const byName={};rows.forEach(x=>{const k=x.name;byName[k]=byName[k]||{name:k,count:0,revenue:0,target:0,start:0,kstart:0,soup:0,dessert:0,drink:0};const o=byName[k];o.count++;['revenue','target',...keys].forEach(f=>o[f]+=Number(x[f]||0));});
+ const ranking=Object.values(byName).sort((a,b)=>b.revenue-a.revenue);
+ const dayCount=new Set(rows.map(x=>x.date)).size;
+ panel.dataset.from=from;panel.dataset.to=to;
+ panel.innerHTML=`<div class="report-head"><h1>RESTORAN YÖNETİM RAPORU</h1><p>${fmtDate(from)} – ${fmtDate(to)}</p></div>
+ <div class="stats" style="grid-template-columns:repeat(auto-fit,minmax(135px,1fr));margin:14px 0"><div class="stat"><span>Toplam ciro</span><strong>${money(totalRev)}</strong></div><div class="stat"><span>Toplam hedef</span><strong>${money(totalTarget)}</strong></div><div class="stat"><span>Hedef gerçekleşme</span><strong>${totalTarget?Math.round(totalRev/totalTarget*100)+'%':'-'}</strong></div><div class="stat"><span>Toplam ürün adedi</span><strong>${totalUnits.toLocaleString('tr-TR')}</strong></div><div class="stat"><span>Kayıtlı gün</span><strong>${dayCount}</strong></div><div class="stat"><span>Personel</span><strong>${ranking.length}</strong></div></div>
+ <h3>Ürün grubu toplamları</h3><div class="tablewrap"><table><thead><tr><th>Ürün grubu</th><th>Toplam adet</th></tr></thead><tbody><tr><td>Başlangıç</td><td>${sum(rows,'start')}</td></tr><tr><td>K. Başlangıç</td><td>${sum(rows,'kstart')}</td></tr><tr><td>Çorba</td><td>${sum(rows,'soup')}</td></tr><tr><td>Tatlı</td><td>${sum(rows,'dessert')}</td></tr><tr><td>Ferahlatan içecek</td><td>${sum(rows,'drink')}</td></tr><tr><th>Genel toplam</th><th>${totalUnits}</th></tr></tbody></table></div>
+ <h3>Personel performans sıralaması</h3><div class="tablewrap"><table><thead><tr><th>Sıra</th><th>Personel</th><th>Başlangıç</th><th>K.Baş.</th><th>Çorba</th><th>Tatlı</th><th>İçecek</th><th>Ciro</th><th>Hedef</th><th>Gerç.</th></tr></thead><tbody>${ranking.length?ranking.map((x,i)=>`<tr><td>${i+1}</td><td><b>${esc(x.name)}</b></td><td>${x.start}</td><td>${x.kstart}</td><td>${x.soup}</td><td>${x.dessert}</td><td>${x.drink}</td><td>${money(x.revenue)}</td><td>${money(x.target)}</td><td>${x.target?Math.round(x.revenue/x.target*100)+'%':'-'}</td></tr>`).join(''):'<tr><td colspan="10" class="empty">Bu tarih aralığında satış kaydı bulunamadı.</td></tr>'}</tbody><tfoot><tr><th colspan="2">GENEL TOPLAM</th><th>${sum(rows,'start')}</th><th>${sum(rows,'kstart')}</th><th>${sum(rows,'soup')}</th><th>${sum(rows,'dessert')}</th><th>${sum(rows,'drink')}</th><th>${money(totalRev)}</th><th>${money(totalTarget)}</th><th>${totalTarget?Math.round(totalRev/totalTarget*100)+'%':'-'}</th></tr></tfoot></table></div>
+ <p class="report-foot">Rapor, bu cihazda kayıtlı personel satışları esas alınarak oluşturulmuştur.</p>`;
+}
+document.getElementById('reportToday').onclick=()=>setReportRange('day');
+document.getElementById('reportWeek').onclick=()=>setReportRange('week');
+document.getElementById('reportMonth').onclick=()=>setReportRange('month');
+document.getElementById('runReport').onclick=renderSalesReport;
+document.getElementById('reportFrom').addEventListener('change',renderSalesReport);
+document.getElementById('reportTo').addEventListener('change',renderSalesReport);
+document.getElementById('printSalesReport').onclick=()=>{renderSalesReport();window.print();};
+document.getElementById('exportSalesReport').onclick=()=>{renderSalesReport();const from=document.getElementById('reportFrom').value,to=document.getElementById('reportTo').value;const rows=data.staff.filter(x=>x.date>=from&&x.date<=to);const headers=['Tarih','Personel','Başlangıç','K. Başlangıç','Çorba','Tatlı','Ferahlatan içecek','Ciro','Hedef'];const lines=[headers,...rows.map(x=>[x.date,x.name,x.start,x.kstart,x.soup,x.dessert,x.drink,x.revenue,x.target])];const csv='\ufeff'+lines.map(r=>r.map(v=>'"'+String(v??'').replace(/"/g,'""')+'"').join(';')).join('\r\n');const a=document.createElement('a'),url=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));a.href=url;a.download=`yonetim-raporu-${from}-${to}.csv`;a.click();URL.revokeObjectURL(url);};
+
+render();
+</script>
+
+<script>
+let deferredInstallPrompt=null;
+window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();deferredInstallPrompt=e;const bar=document.getElementById('pwaInstallBar');if(bar)bar.style.display='block';});
+document.addEventListener('click',async e=>{if(e.target&&e.target.id==='pwaInstallBtn'&&deferredInstallPrompt){deferredInstallPrompt.prompt();await deferredInstallPrompt.userChoice;deferredInstallPrompt=null;document.getElementById('pwaInstallBar').style.display='none';}});
+window.addEventListener('appinstalled',()=>{const bar=document.getElementById('pwaInstallBar');if(bar)bar.style.display='none';});
+</script>
+</body></html>
+<script>if('serviceWorker' in navigator && location.protocol!=='file:'){window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{}));}</script>
