@@ -4,12 +4,14 @@
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#0B0B0B;"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="description" content="Akıllı Restoran Yönetim Sistemi"><link rel="manifest" href="manifest.webmanifest"><link rel="icon" href="icon.svg" type="image/svg+xml">
 <title>Akıllı Restoran Yönetim Sistemi</title>
 <style>
-:root{--brand:#96004B;--brand-dark:#68002f;--brand-soft:#f8e8f0;--brand-pink:#D393B3;--brand-red:#AE2E3A;--spice:#F8C808;--ink:#30242a;--muted:#766873;--line:#eadde4;--bg:#fff9fb;--amber:#fff4d2;--red:#fde8e6}
-*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:15px system-ui,-apple-system,Segoe UI,sans-serif}
- body{background-image:linear-gradient(rgba(255,249,251,.94),rgba(255,249,251,.94)),url('./fy-icon-144.png');background-repeat:no-repeat;background-position:center;background-size:cover,min(78vw,420px) auto;background-attachment:fixed}
-header{background:linear-gradient(115deg,var(--brand-dark),var(--brand));color:white;padding:20px max(18px,calc((100% - 1120px)/2));border-bottom:5px solid var(--spice)}
-.brandline{display:flex;align-items:center;gap:13px}
-.brandmark{width:52px;height:52px;flex:0 0 52px;border:2px solid rgba(255,255,255,.85);border-radius:16px;display:grid;place-items:center;background:rgba(255,255,255,.12);font-weight:900;font-size:17px;letter-spacing:-1px;box-shadow:0 3px 12px #35001f55}
+:root{--brand:#D9A441;--brand-dark:#3B001F;--brand-soft:#5A1738;--brand-pink:#D393B3;--brand-red:#AE2E3A;--spice:#F8C808;--ink:#FFF4D2;--muted:#E6C9D7;--line:#A87542;--bg:#68002F;--amber:#5A1738;--red:#70202F}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px system-ui,-apple-system,Segoe UI,sans-serif;background-image:linear-gradient(rgba(104,0,47,.88),rgba(104,0,47,.88)),url('./fy-icon-144.png');background-repeat:no-repeat;background-position:center;background-size:cover,min(78vw,420px) auto;background-attachment:fixed}
+.stat,.panel{background:#5A1738;color:#FFF4D2;border:1px solid #D9A441}
+.stat span,.sub,th{color:#F2D58A}
+.row{border-color:#D9A441}
+table td,table th{border-color:#A87542}
+
 .brandname{font-size:12px;font-weight:800;letter-spacing:2px;color:#ffe9f2}
 header small{opacity:.9;letter-spacing:1.2px}header h1{font-size:23px;margin:3px 0}header p{margin:0;opacity:.9;font-size:13px}
 main{max-width:1120px;margin:22px auto;padding:0 16px 40px}
@@ -47,6 +49,12 @@ footer{color:var(--muted);font-size:12px;margin-top:16px}
  #printReport th{background:#eee!important}
  #printReport h3{page-break-after:avoid}
 }
+ .stat,.panel{background:#5A1738!important;color:#FFF4D2!important;border:1px solid #D9A441!important}
+.stat span,.sub,th,.panel h2{color:#F2D58A!important}
+.stat strong,td,.row,label{color:#FFF4D2}
+.tabs button{background:#5A1738;color:#FFF4D2;border-color:#D9A441}
+.tabs button.active,button.primary{background:#D9A441;color:#3B001F}
+input,select,textarea{background:#5A1738;color:#FFF4D2;border-color:#D9A441}
 </style>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 </head>
