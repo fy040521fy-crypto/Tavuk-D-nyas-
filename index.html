@@ -309,9 +309,8 @@ function renderDashboard(){
  document.getElementById('dashTodayTarget').textContent=money(target);
  document.getElementById('dashTodayRate').textContent=target>0?Math.round(rev/target*100)+'%':'-%';
  document.getElementById('dashMonthRevenue').textContent=money(monthRev);
- document.getElementById('dashBest').textContent=best?best.name:'Henüz yok';
- document.getElementById('dashBestDetail').textContent=best?`Bugünün en yüksek cirosu: ${best.name} · ${money(best.revenue)} · Hedef gerçekleşme: ${best.target>0?Math.round(best.revenue/best.target*100)+'%':'Hedef girilmemiş'}`:'Bugün henüz personel satış kaydı girilmedi.';
- const labels=[['Başlangıç','start'],['K. Başlangıç','kstart'],['Çorba','soup'],['Tatlı','dessert'],['Ferahlatan içecek','drink']];
+ 
+ 
  document.getElementById('dashProductTotals').innerHTML=labels.map(([label,key])=>`<tr><td>${label}</td><td>${sum(todayRows,key)}</td><td>${sum(monthRows,key)}</td></tr>`).join('');
 }
 function renderStaff(){
