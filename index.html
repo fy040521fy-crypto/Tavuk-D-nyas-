@@ -62,10 +62,18 @@ input,select,textarea{background:#5A1738;color:#FFF4D2;border-color:#D9A441}
 <header><div class="brandline"><div class="brandmark" aria-label="Tavuk Dünyası temalı uygulama simgesi">TD</div><div><div class="brandname">RESTORAN OPERASYON PLATFORMU</div><h1>Akıllı Restoran Yönetim Sistemi</h1><p>Günlük operasyon · SKT takibi · Stok yönetimi · Raporlama</p></div><div style="margin-left:auto;display:flex;gap:8px;flex-wrap:wrap"><button class="secondary" id="backupExport">Yedeği indir</button><button class="secondary" id="backupImportBtn">Yedek yükle</button><input id="backupFile" type="file" accept="application/json" style="display:none"></div></div></header>
 <div id="pwaInstallBar" style="display:none;max-width:1120px;margin:12px auto;padding:0 16px"><button class="primary" id="pwaInstallBtn" style="width:100%">Uygulamayı telefona yükle</button></div>
 <main>
+ <nav class="tabs">
+<button class="active" data-tab="checks">Günlük kontroller</button>
+<button data-tab="expiry">SKT takibi</button>
+<button data-tab="stock">Stok takibi</button>
+<button data-tab="staff">Personel performansı</button>
+<button data-tab="reports">Yönetim raporları</button>
+<button data-tab="history">Geçmiş kayıtlar</button>
+ </nav>
 
 
 
-<section class="stats">
+<section id="checks" class="panel">
  <div class="stat"><span>Kontrol tamamlandı</span><strong id="doneCount">0 / 0</strong></div>
 
  <h2>Günlük kontrol listesi</h2><p class="sub">Kontrol ettiğiniz maddeleri işaretleyin. İşaretler bu cihazdaki tarayıcıda saklanır.</p>
