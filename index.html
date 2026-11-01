@@ -108,7 +108,178 @@ table td{
 button{
   transition:all .2s ease;
 }
+/* NEON GRAFIK TASARIMI */
+.dash-grid{
+ display:grid;
+ grid-template-columns:repeat(2,minmax(0,1fr));
+ gap:16px;
+ margin-top:18px;
+}
+.dash-card{
+ min-width:0;
+ padding:18px;
+ border:1px solid #7545a5;
+ border-radius:18px;
+ background:linear-gradient(145deg,#211633,#11111e);
+ box-shadow:0 0 16px #a855f733;
+}
+.dash-wide{grid-column:1/-1}
+.dash-card h3{
+ color:#e8caff;
+ margin:0 0 16px;
+ font-size:17px;
+}
+#dashRevenueChart,#dashGoalChart,#dashProductChart,
+#dashStaffRanking,#dashStockCards{
+ width:100%;
+ min-width:0;
+}
+#dashRevenueChart{
+ overflow-x:auto;
+}
+.dash-card strong{
+ color:#e9d5ff;
+}
+.dash-card b{
+ color:#f5efff;
+}
+@media(max-width:680px){
+ .dash-grid{grid-template-columns:1fr;gap:12px}
+ .dash-wide{grid-column:auto}
+ .dash-card{padding:14px}
+  /* ANA SAYFA - MOR NEON TASARIM */
+#dashboard{
+ background:linear-gradient(145deg,#160d25,#090711);
+ border:1px solid #8b35bd;
+ border-radius:22px;
+ padding:20px;
+ box-shadow:0 0 25px #a855f733;
+ color:#fff;
+}
 
+#dashboard h2{
+ color:#f0caff;
+ font-size:25px;
+ text-shadow:0 0 14px #c026d3;
+}
+
+#dashboard .sub{
+ color:#c7a8df;
+}
+
+#dashboard .stats{
+ display:grid;
+ grid-template-columns:repeat(5,minmax(0,1fr));
+ gap:10px;
+}
+
+#dashboard .stat{
+ background:linear-gradient(145deg,#32134b,#171025);
+ border:1px solid #a855f7;
+ border-radius:16px;
+ padding:15px 10px;
+ box-shadow:0 0 13px #a855f733;
+ min-width:0;
+}
+
+#dashboard .stat span{
+ color:#d8b4fe;
+ font-size:12px;
+}
+
+#dashboard .stat strong{
+ display:block;
+ color:#fff;
+ font-size:20px;
+ margin-top:8px;
+ overflow-wrap:anywhere;
+}
+
+.compact-dash{
+ display:grid;
+ grid-template-columns:repeat(2,minmax(0,1fr));
+ gap:13px;
+ margin-top:18px;
+}
+
+.compact-dash .dash-card{
+ min-width:0;
+ padding:15px;
+ border:1px solid #bd4cff;
+ border-radius:18px;
+ background:linear-gradient(145deg,#29143e,#110c1c);
+ box-shadow:0 0 16px #c026d355;
+ overflow:hidden;
+}
+
+.compact-dash .dash-card h3{
+ color:#f0caff;
+ font-size:15px;
+ margin:0 0 13px;
+}
+
+.compact-dash .dash-span{
+ grid-column:1/-1;
+}
+
+#dashRevenueChart,
+#dashSalesDistribution,
+#dashProductChart,
+#dashStaffRanking,
+#dashStockCards{
+ width:100%;
+ min-width:0;
+}
+
+#dashStaffRanking > div > div{
+ transition:transform .2s,box-shadow .2s;
+}
+
+#dashStaffRanking > div > div:hover{
+ transform:translateY(-4px);
+ box-shadow:0 0 18px #c026d366;
+}
+
+#dashboard svg{
+ max-width:100%;
+}
+
+@media(max-width:680px){
+ #dashboard{
+  padding:12px;
+  border-radius:16px;
+ }
+ #dashboard .stats{
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:8px;
+ }
+ #dashboard .stat{
+  padding:12px 9px;
+ }
+ #dashboard .stat strong{
+  font-size:17px;
+ }
+ .compact-dash{
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:9px;
+ }
+ .compact-dash .dash-card{
+  padding:10px;
+  border-radius:14px;
+ }
+ .compact-dash .dash-card h3{
+  font-size:13px;
+ }
+ .compact-dash .dash-span{
+  grid-column:1/-1;
+ }
+}
+
+@media(min-width:1000px){
+ .compact-dash{
+  grid-template-columns:repeat(2,minmax(0,1fr));
+ }
+ }                                     }
 </style>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 </head>
@@ -127,13 +298,33 @@ button{
     <div class="stat"><span>Ürün adedi</span><strong id="dashTodayUnits">0</strong></div>
     <div class="stat"><span>Aylık ciro</span><strong id="dashMonthRevenue">₺0</strong></div>
   </div>
-  <h3>📊 Ürün satış grafiği</h3>
-  <div id="dashProductChart"></div>
-  <h3>🏆 Personel performans sıralaması</h3>
-  <div id="dashStaffRanking"></div>
-  <h3>📦 Stok durumu</h3>
-  <div id="dashStockCards"></div>
-</section>
+ <div class="dash-grid compact-dash">
+  <div class="dash-card">
+    <h3>📈 Aylık Ciro Grafiği</h3>
+    <div id="dashRevenueChart"></div>
+  </div>
+
+  <div class="dash-card">
+    <h3>🍩 Satış Dağılımı</h3>
+    <div id="dashSalesDistribution"></div>
+  </div>
+
+  <div class="dash-card">
+    <h3>📊 Ürün Satış Grafiği</h3>
+    <div id="dashProductChart"></div>
+  </div>
+
+  <div class="dash-card">
+    <h3>🏆 Personel Podyumu</h3>
+    <div id="dashStaffRanking"></div>
+  </div>
+
+  <div class="dash-card dash-span">
+    <h3>📦 Stok Durumu</h3>
+    <div id="dashStockCards"></div>
+  </div>
+</div>
+</section> 
 
  <nav class="tabs">
   <button class="active" data-tab="dashboard">🏠 Ana Sayfa</button>
@@ -785,33 +976,133 @@ function renderDashboard(){
  document.getElementById('dashProductTotals').innerHTML=labels.map(([label,key])=>`<tr><td>${label}</td><td>${sum(todayRows,key)}</td><td>${sum(monthRows,key)}</td></tr>`).join('');
 }
 
+
 function renderDashboardVisual(){
- const t=today(),month=t.slice(0,7);
+ const now=new Date();
+ const t=today();
+ const month=t.slice(0,7);
  const rows=data.staff.filter(x=>x.date===t);
  const monthRows=data.staff.filter(x=>x.date&&x.date.slice(0,7)===month);
+
  const sum=(arr,k)=>arr.reduce((a,x)=>a+Number(x[k]||0),0);
- const rev=sum(rows,'revenue'),target=sum(rows,'target');
  const units=arr=>arr.reduce((a,x)=>a+['start','kstart','soup','dessert','drink'].reduce((n,k)=>n+Number(x[k]||0),0),0);
+
+ const rev=sum(rows,'revenue');
+ const target=sum(rows,'target');
+ const rate=target?Math.round(rev/target*100):0;
+
  document.getElementById('dashTodayRevenue').textContent=money(rev);
  document.getElementById('dashTodayTarget').textContent=money(target);
- document.getElementById('dashTodayRate').textContent=target?Math.round(rev/target*100)+'%':'-%';
+ document.getElementById('dashTodayRate').textContent=target?rate+'%':'-%';
  document.getElementById('dashTodayUnits').textContent=units(rows).toLocaleString('tr-TR');
  document.getElementById('dashMonthRevenue').textContent=money(sum(monthRows,'revenue'));
- const labels=[['Başlangıç','start'],['K. Başlangıç','kstart'],['Çorba','soup'],['Tatlı','dessert'],['İçecek','drink']];
- document.getElementById('dashProductChart').innerHTML=labels.map(([name,key])=>{
-  const n=sum(rows,key),max=Math.max(1,...labels.map(x=>sum(rows,x[1])));
-  return `<div style="margin:12px 0"><b>${name} — ${n}</b><div style="height:12px;background:#292039;border-radius:20px;overflow:hidden"><div style="height:100%;width:${n/max*100}%;background:linear-gradient(90deg,#812be0,#d879ff);border-radius:20px"></div></div></div>`;
+
+ // AYLIK CIRO - ALAN GRAFIGI
+ const days=new Date(now.getFullYear(),now.getMonth()+1,0).getDate();
+ const daily=[];
+ for(let d=1;d<=days;d++){
+  const key=month+'-'+String(d).padStart(2,'0');
+  daily.push({day:d,value:sum(data.staff.filter(x=>x.date===key),'revenue')});
+ }
+ const maxRev=Math.max(1,...daily.map(x=>x.value));
+ const W=600,H=220,L=48,R=12,T=15,B=30;
+ const pts=daily.map((x,i)=>{
+  const px=L+i*(W-L-R)/(days-1);
+  const py=T+(H-T-B)*(1-x.value/maxRev);
+  return {x:px,y:py,day:x.day,value:x.value};
+ });
+ const line=pts.map(p=>p.x+','+p.y).join(' ');
+ const area='M '+L+','+(H-B)+' L '+pts.map(p=>p.x+','+p.y).join(' L ')+' L '+(W-R)+','+(H-B)+' Z';
+ const ticks=[0,.25,.5,.75,1].map(v=>{
+  const y=T+(H-T-B)*(1-v);
+  return '<line x1="'+L+'" y1="'+y+'" x2="'+(W-R)+'" y2="'+y+'" stroke="#65427d" opacity=".55"/>'+
+  '<text x="'+(L-7)+'" y="'+(y+4)+'" text-anchor="end" fill="#c4b5d0" font-size="10">'+Math.round(maxRev*v/1000)+'B</text>';
  }).join('');
+ const dayLabels=pts.filter(p=>p.day===1||p.day%5===0||p.day===days).map(p=>
+  '<text x="'+p.x+'" y="'+(H-8)+'" text-anchor="middle" fill="#d8c6e8" font-size="11">'+p.day+'</text>'
+ ).join('');
+ document.getElementById('dashRevenueChart').innerHTML=
+ '<div style="display:flex;justify-content:space-between;gap:8px;margin-bottom:8px;color:#d8c6e8;font-size:12px"><b>'+now.toLocaleDateString('tr-TR',{month:'long',year:'numeric'})+'</b><strong>'+money(sum(monthRows,'revenue'))+'</strong></div>'+
+ '<svg viewBox="0 0 '+W+' '+H+'" style="width:100%;height:auto;overflow:visible">'+
+ '<defs><linearGradient id="revenueFill" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#e879f9" stop-opacity=".8"/><stop offset="100%" stop-color="#9333ea" stop-opacity=".04"/></linearGradient></defs>'+
+ ticks+'<path d="'+area+'" fill="url(#revenueFill)"/>'+
+ '<polyline points="'+line+'" fill="none" stroke="#e879f9" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>'+
+ pts.map(p=>'<circle cx="'+p.x+'" cy="'+p.y+'" r="3" fill="#fff" stroke="#d946ef" stroke-width="2"><title>'+p.day+'. gün: '+money(p.value)+'</title></circle>').join('')+
+ dayLabels+'</svg>';
+
+ // SATIS DAGILIMI - HALKA GRAFIK
+ const labels=[['Başlangıç','start','#a855f7'],['K. Başlangıç','kstart','#3b82f6'],['Çorba','soup','#f59e0b'],['Tatlı','dessert','#ec4899'],['İçecek','drink','#10b981']];
+ const products=labels.map(([name,key,color])=>({name,value:sum(rows,key),color}));
+ const totalProducts=products.reduce((a,x)=>a+x.value,0);
+ let angle=0;
+ const gradient=products.map(x=>{
+  const start=angle;
+  angle+=totalProducts?x.value/totalProducts*360:0;
+  return x.color+' '+start+'deg '+angle+'deg';
+ }).join(',');
+ document.getElementById('dashSalesDistribution').innerHTML=
+ '<div style="display:flex;align-items:center;justify-content:center;gap:12px;flex-wrap:wrap;padding:8px 0">'+
+ '<div style="width:145px;height:145px;border-radius:50%;background:'+ (totalProducts?'conic-gradient('+gradient+')':'#49345f') +';display:grid;place-items:center;flex-shrink:0">'+
+ '<div style="width:82px;height:82px;border-radius:50%;background:#21132f;display:flex;flex-direction:column;align-items:center;justify-content:center;color:white"><b style="font-size:21px">'+totalProducts.toLocaleString('tr-TR')+'</b><small>Toplam</small></div></div>'+
+ '<div style="flex:1;min-width:120px">'+products.map(x=>
+ '<div style="display:flex;justify-content:space-between;gap:5px;margin:9px 0;font-size:11px;color:#eee"><span><i style="display:inline-block;width:9px;height:9px;border-radius:3px;background:'+x.color+';margin-right:5px"></i>'+x.name+'</span><b>'+x.value+'</b></div>'
+ ).join('')+'</div></div>';
+
+ // URUN SATISLARI - RENKLI SUTUN GRAFIGI
+ const productLabels=[['Başlangıç','start','#c026d3'],['K. Başlangıç','kstart','#8b5cf6'],['Çorba','soup','#f59e0b'],['Tatlı','dessert','#ec4899'],['İçecek','drink','#06b6d4']];
+ const productData=productLabels.map(([name,key,color])=>({name,value:sum(rows,key),color})).sort((a,b)=>b.value-a.value);
+ const maxProduct=Math.max(1,...productData.map(x=>x.value));
+ document.getElementById('dashProductChart').innerHTML=
+ '<div style="height:220px;display:flex;align-items:flex-end;justify-content:space-around;gap:8px;padding:12px 3px 0;border-bottom:1px solid #76508d">'+
+ productData.map(x=>
+ '<div style="flex:1;min-width:0;height:100%;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;gap:7px">'+
+ '<b style="font-size:12px;color:#fff">'+x.value+'</b>'+
+ '<div style="width:min(100%,48px);height:'+Math.max(3,x.value/maxProduct*145)+'px;max-height:145px;background:linear-gradient(180deg,'+x.color+',#4c1d95);border-radius:9px 9px 3px 3px;box-shadow:0 0 12px '+x.color+'66"></div>'+
+ '<small style="font-size:10px;color:#e9d5ff;text-align:center">'+x.name+'</small></div>'
+ ).join('')+'</div>';
+
+ // PERSONEL - BUTUN ISIMLERLE PODIUM
  const people={};
- rows.forEach(x=>people[x.name]=(people[x.name]||0)+Number(x.revenue||0));
+ rows.forEach(x=>{
+  const name=x.name||'İsimsiz';
+  people[name]=(people[name]||0)+Number(x.revenue||0);
+ });
  const ranking=Object.entries(people).sort((a,b)=>b[1]-a[1]);
- document.getElementById('dashStaffRanking').innerHTML=ranking.length?ranking.map((x,i)=>`<div class="row"><b>${i+1}. ${esc(x[0])}</b><span>${money(x[1])}</span></div>`).join(''):'Henüz bugünkü personel kaydı yok.';
- document.getElementById('dashStockCards').innerHTML=data.stock.length?data.stock.map(x=>{
-  const low=Number(x.qty)<=Number(x.min);
-  const pct=Number(x.min)>0?Math.min(100,Number(x.qty)/Number(x.min)*100):100;
-  return `<div class="stat"><b>${esc(x.name)}</b><strong>${x.qty} ${esc(x.unit||'adet')}</strong><span>${low?'⚠️ Stok az':'✓ Stok yeterli'}</span><div style="height:8px;background:#292039;border-radius:20px;overflow:hidden"><div style="height:100%;width:${pct}%;background:${low?'#ff657a':'#42d9a0'}"></div></div></div>`;
- }).join(''):'Henüz stok kaydı yok.';
-}
+ const podiumColors=['#fbbf24','#c4b5fd','#fb923c'];
+ const medals=['👑','🥈','🥉'];
+ document.getElementById('dashStaffRanking').innerHTML=ranking.length?
+ '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(105px,1fr));gap:9px;padding:8px 0">'+
+ ranking.map((x,i)=>{
+  const color=podiumColors[i]||'#a855f7';
+  const medal=medals[i]||'🏅';
+  return '<div style="min-width:0;text-align:center;padding:13px 6px;border:1px solid '+color+'88;border-radius:14px;background:linear-gradient(160deg,#302044,#171124);box-shadow:0 0 12px '+color+'22">'+
+  '<div style="font-size:25px">'+medal+'</div>'+
+  '<div style="font-size:12px;color:'+color+';font-weight:800">'+(i+1)+'. SIRA</div>'+
+  '<div style="font-size:14px;font-weight:800;color:white;margin:7px 0;overflow-wrap:anywhere">'+esc(x[0])+'</div>'+
+  '<div style="font-size:12px;color:#e9d5ff;font-weight:700">'+money(x[1])+'</div>'+
+  '</div>';
+ }).join('')+'</div>':'Henüz bugünkü personel kaydı yok.';
+
+ // STOK - RENKLI KOMPAKT KARTLAR
+ const stockItems=[...(data.stock||[])].sort((a,b)=>{
+  const la=Number(a.qty||0)<=Number(a.min||0);
+  const lb=Number(b.qty||0)<=Number(b.min||0);
+  return Number(lb)-Number(la);
+ });
+ document.getElementById('dashStockCards').innerHTML=stockItems.length?
+ '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(145px,1fr));gap:9px">'+
+ stockItems.map(x=>{
+  const qty=Number(x.qty)||0;
+  const min=Number(x.min)||0;
+  const low=qty<=min;
+  const color=low?'#fb7185':'#34d399';
+  return '<div style="padding:12px;border:1px solid '+color+'88;border-radius:13px;background:linear-gradient(145deg,#291b3b,#171124);min-width:0">'+
+  '<div style="font-size:13px;font-weight:700;color:#fff;overflow-wrap:anywhere">'+esc(x.name)+'</div>'+
+  '<div style="font-size:19px;font-weight:800;color:'+color+';margin:7px 0">'+qty+' <small style="font-size:11px">'+esc(x.unit||'adet')+'</small></div>'+
+  '<small style="color:'+color+'">'+(low?'⚠ Kritik stok':'✓ Stok yeterli')+'</small></div>';
+ }).join('')+'</div>':'Henüz stok kaydı yok.';
+            }
+
 
  function renderStaff(){
  const date=document.getElementById('staffFilterDate').value;
