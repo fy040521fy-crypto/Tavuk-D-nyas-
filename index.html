@@ -174,7 +174,8 @@ input,select,textarea{background:#5A1738;color:#FFF4D2;border-color:#D9A441}
 <label>Not başlığı</label>
 <input id="generalNoteTitle" placeholder="Not başlığı">
 <label>Not açıklaması</label>
-<textarea id="generalNoteText" rows="4"></textarea>
+<textarea id="generalNoteText" rows="4"></textarea><label>Fotoğraf ekle</label>
+<input id="generalNotePhoto" type="file" accept="image/*">
 <button class="primary" id="saveGeneralNote">Genel notu kaydet</button>
 <div id="generalNotesList"></div>
 </div>
@@ -399,7 +400,63 @@ function render(){
 }
 function esc(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
 window.removeItem=(type,i)=>{if(confirm('Bu kaydı silmek istiyor musunuz?')){data[type].splice(i,1);persist();}};
-document.querySelectorAll('[data-tab]').forEach(b=>b.addEventListener('click',()=>{document.querySelectorAll('[data-tab]').forEach(x=>x.classList.toggle('active',x===b));['checks','expiry','stock','staff','reports','history','handover','minutes'].forEach(id=>document.getElementById(id).classList.toggle('hidden',id!==b.dataset.tab));if(b.dataset.tab==='history')renderHistory();if(b.dataset.tab==='staff')renderStaff();if(b.dataset.tab==='reports')renderSalesReport();}));
+data.dailyProductNotes=data.dailyProductNotes||[];
+data.generalNotes=data.generalNotes||[];
+ function renderDailyProductNotes(){
+const products=['Domates','Portakal suyu','Havuç','Mantar','Limon','Nar ekşisi','Zeytinyağı','Zeytin','Ayçiçek yağı','Yeşillik','Mısır','Domates kurusu','Sufle','Tiramisu','Patates (7×79×18)','Sebze','Peynir çubukları','Ekmek','Hazırlanan makarna miktarı'];
+const saved=data.dailyProductNotes||[];
+document.getElementById('dailyProductRows').innerHTML=products.map((name,i)=>{
+const x=saved[i]||{};
+return `<tr><td>${name}</td><td><input type="number" min="0" step="any" data-product-qty="${i}" value="${x.qty||''}" placeholder="Miktar"></td><td><select data-product-unit="${i}">${['adet','paket','koli','kg','gram','litre','şişe','demet','tepsi'].map(u=>`<option ${x.unit===u?'selected':''}>${u}</option>`).join('')}</select></td><td><input type="time" data-product-time="${i}" value="${x.time||''}"></td></tr>`;
+}).join('');
+}
+function renderGeneralNotes(){
+document.getElementById('generalNotesList').innerHTML=(data.generalNotes||[]).map((n,i)=>`<div class="panel"><b>${esc(n.title)}</b><div class="sub">${esc(n.date||'')}</div><p>${esc(n.text)}</p>${n.photo?`<img src="${n.photo}" style="max-width:100%;max-height:300px;border-radius:12px;margin-top:8px">`:''}<button class="secondary" onclick="removeItem('generalNotes',${i})">Sil</button></div>`).join('');
+}
+document.getElementById('saveDailyProductNotes').onclick=()=>{
+data.dailyProductNotes=Array.from(document.querySelectorAll('[data-product-qty]')).map((el,i)=>({name:['Domates','Portakal suyu','Havuç','Mantar','Limon','Nar ekşisi','Zeytinyağı','Zeytin','Ayçiçek yağı','Yeşillik','Mısır','Domates kurusu','Sufle','Tiramisu','Patates (7×79×18)','Sebze','Peynir çubukları','Ekmek','Hazırlanan makarna miktarı'][i],qty:el.value,unit:document.querySelector(`[data-product-unit="${i}"]`).value,time:document.querySelector(`[data-product-time="${i}"]`).value}));
+renderDailyProductNotes();
+ localStorage.setItem(key,JSON.stringify(data));
+document.getElementById('dailyProductMsg').textContent='Günlük ürün notları kaydedildi.';
+};
+document.getElementById('saveGeneralNote').onclick=async()=>{
+ const photoInput=document.getElementById('generalNotePhoto');
+const file=photoInput.files[0];
+let photo='';
+if(file){
+photo=await new Promise(resolve=>{
+const reader=new FileReader();
+reader.onload=()=>resolve(reader.result);
+reader.readAsDataURL(file);
+});
+}
+const title=document.getElementById('generalNoteTitle').value.trim();
+const text=document.getElementById('generalNoteText').value.trim();
+if(!title||!text){alert('Başlık ve açıklama girin.');return;}
+data.generalNotes.push({title,text,date:today(),photo});
+document.getElementById('generalNoteTitle').value='';
+document.getElementById('generalNoteText').value='';
+persist();
+renderGeneralNotes();
+};
+document.getElementById('dailyProductTab').onclick=()=>{
+document.getElementById('dailyProductNotes').classList.remove('hidden');
+document.getElementById('generalNotes').classList.add('hidden');
+document.getElementById('dailyProductTab').classList.add('active');
+document.getElementById('generalNotesTab').classList.remove('active');
+};
+document.getElementById('generalNotesTab').onclick=()=>{
+document.getElementById('generalNotes').classList.remove('hidden');
+document.getElementById('dailyProductNotes').classList.add('hidden');
+document.getElementById('generalNotesTab').classList.add('active');
+document.getElementById('dailyProductTab').classList.remove('active');
+};
+ document.getElementById('enableNoteNotifications').onclick=async()=>{
+if(!('Notification' in window)){alert('Bu tarayıcı bildirimleri desteklemiyor.');return;}
+const permission=await Notification.requestPermission();
+alert(permission==='granted'?'Bildirim izni açıldı.':'Bildirim izni verilmedi.');
+};
+ document.querySelectorAll('[data-tab]').forEach(b=>b.addEventListener('click',()=>{document.querySelectorAll('[data-tab]').forEach(x=>x.classList.toggle('active',x===b));['checks','expiry','stock','staff','reports','history','handover','minutes','notes'].forEach(id=>document.getElementById(id).classList.toggle('hidden',id!==b.dataset.tab));if(b.dataset.tab==='history')renderHistory();if(b.dataset.tab==='staff')renderStaff();if(b.dataset.tab==='reports')renderSalesReport();}))if(b.dataset.tab==='reports')renderSalesReport();if(b.dataset.tab==='notes'){renderDailyProductNotes();renderGeneralNotes();}}));;
 document.getElementById('addExpiry').onclick=()=>{let name=expName.value.trim(),date=expDate.value;if(!name||!date){alert('Ürün adı ve SKT girin.');return;}data.expiry.push({name,date,qty:expQty.value.trim()});expName.value='';expDate.value='';expQty.value='';persist();};
 document.getElementById('addStock').onclick=()=>{
  const name=document.getElementById('stockName').value.trim();
