@@ -56,6 +56,59 @@ footer{color:var(--muted);font-size:12px;margin-top:16px}
 .tabs button{background:#5A1738;color:#FFF4D2;border-color:#D9A441}
 .tabs button.active,button.primary{background:#D9A441;color:#3B001F}
 input,select,textarea{background:#5A1738;color:#FFF4D2;border-color:#D9A441}
+ 
+/* NEON MOR TASARIM */
+:root{
+  --bg:#090914;
+  --panel:#151525;
+  --brand:#a855f7;
+  --brand-soft:#24133b;
+  --line:#49306b;
+  --ink:#f5efff;
+  --muted:#b7a9ca;
+}
+body{
+  background:radial-gradient(ellipse at top,#211038 0%,#0b0b17 55%,#070710 100%) !important;
+  color:#f5efff !important;
+}
+header,.panel,.stat,.formgrid,.notice{
+  background:linear-gradient(145deg,#19172a,#11111e) !important;
+  border:1px solid #49306b !important;
+  border-radius:16px !important;
+  box-shadow:0 0 12px #9b4dff20, inset 0 0 12px #9b4dff08 !important;
+}
+h1,h2,h3,.brandname{
+  color:#e8caff !important;
+}
+.tabs button{
+  background:#191525 !important;
+  color:#d9c8ee !important;
+  border:1px solid #49306b !important;
+  border-radius:12px !important;
+}
+.tabs button.active,.button.primary,button.primary{
+  background:linear-gradient(135deg,#7c2bd9,#bd55ff) !important;
+  color:white !important;
+  border-color:#d18aff !important;
+  box-shadow:0 0 14px #a855f780 !important;
+}
+input,select,textarea{
+  background:#100e1b !important;
+  color:#fff !important;
+  border:1px solid #7545a5 !important;
+  border-radius:10px !important;
+}
+table th{
+  background:#28163e !important;
+  color:#e8caff !important;
+}
+table td{
+  border-color:#49306b !important;
+}
+button{
+  transition:all .2s ease;
+}
+
 </style>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 </head>
