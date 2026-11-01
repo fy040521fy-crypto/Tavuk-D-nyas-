@@ -410,7 +410,7 @@ const products=['Domates','Portakal suyu','Havuç','Mantar','Limon','Nar ekşisi
 const saved=data.dailyProductNotes||[];
 document.getElementById('dailyProductRows').innerHTML=products.map((name,i)=>{
 const x=saved[i]||{};
-return `<tr><td>${name}</td><td><input type="number" min="0" step="any" data-product-qty="${i}" value="${x.qty||''}" placeholder="Miktar"></td><td><select data-product-unit="${i}">${['adet','paket','koli','kg','gram','litre','şişe','demet','tepsi'].map(u=>`<option ${x.unit===u?'selected':''}>${u}</option>`).join('')}</select></td><td><input type="time" data-product-time="${i}" value="${x.time||''}"></td></tr>`;
+return `<tr><td>${name}</td><td><input type="number" min="0" step="any" data-product-qty="${i}" value="${x.qty||''}" placeholder="Miktar"></td><td><select data-product-unit="${i}">${['adet','paket','koli','kasa','kutu','kg','gram','litre','şişe','demet','tepsi'].map(u=>`<option ${x.unit===u?'selected':''}>${u}</option>`).join('')}</select></td><td><input type="time" data-product-time="${i}" value="${x.time||''}"></td></tr>`;
 }).join('');
 }
 function renderGeneralNotes(){
