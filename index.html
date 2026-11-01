@@ -1376,5 +1376,63 @@ main {
 @media (max-width:600px) and (orientation:portrait){
   .stats{grid-template-columns:repeat(2,minmax(0,1fr))!important}
   .dash-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+/* TD PREMIUM MINI DASHBOARD */
+#dashboard{position:relative!important}
+#dashboard:before{
+ content:"TD";position:fixed;right:8%;top:12%;
+ font-size:190px;font-weight:900;color:#d6a84b;
+ opacity:.025;pointer-events:none;z-index:-1
+}
+.stats{grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:7px!important}
+.stats .stat{
+ padding:9px!important;border:1px solid #98713c!important;
+ background:linear-gradient(145deg,#261936,#100d19)!important;
+ border-radius:13px!important
+}
+.stats .stat span:before{content:"₺ ";color:#e9bd65}
+.stats .stat strong{font-size:17px!important;color:#ffe2a1!important}
+.dash-grid{
+ grid-template-columns:repeat(4,minmax(0,1fr))!important;
+ align-items:start!important;grid-auto-rows:min-content!important;
+ gap:8px!important
+}
+.dash-card{
+ height:auto!important;min-height:155px!important;
+ padding:9px!important;border:1px solid #a47a43!important;
+ background:linear-gradient(145deg,#21152d,#100d19)!important;
+ border-radius:13px!important;
+ box-shadow:0 0 13px #9b59b622!important
+}
+.dash-card h3{font-size:12px!important;color:#f5d58b!important}
+#dashRevenueChart svg{max-height:105px!important}
+#dashSalesDistribution [style*="width:145px"]{
+ width:95px!important;height:95px!important
+}
+#dashSalesDistribution [style*="width:82px"]{
+ width:58px!important;height:58px!important
+}
+#dashProductChart>div{
+ height:145px!important;gap:3px!important;padding:5px 1px!important
+}
+#dashProductChart small{
+ font-size:9px!important;line-height:1.2!important;
+ overflow-wrap:anywhere!important
+}
+#dashProductChart>div>div{gap:4px!important}
+#dashProductChart>div>div>div{max-width:30px!important}
+#dashStaffRanking>div{
+ grid-template-columns:repeat(2,minmax(0,1fr))!important;
+ gap:5px!important
+}
+#dashStaffRanking>div>div{padding:7px 3px!important}
+#dashStockCards>div{
+ grid-template-columns:repeat(3,minmax(0,1fr))!important;
+ gap:5px!important
+}
+#dashStockCards>div>div{padding:8px!important}
+@media(max-width:600px) and (orientation:portrait){
+ .dash-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+ .stats{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+ }
 }</style></body></html>
 <script>if('serviceWorker' in navigator && location.protocol!=='file:'){window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{}));}</script>
