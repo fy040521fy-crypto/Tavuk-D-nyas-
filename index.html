@@ -364,15 +364,23 @@ button{
 
  <nav class="tabs">
   <button class="active" data-tab="dashboard">🏠 Ana Sayfa</button>
-<button data-tab="checks">>Günlük kontroller</button>
+<button data-tab="checks">Günlük kontroller</button>
 <button data-tab="expiry">SKT takibi</button>
 <button data-tab="stock">Stok takibi</button>
 <button data-tab="staff">Personel performansı</button>
-<button data-tab="reports">Yönetim raporları</button>
-<button data-tab="history">Geçmiş kayıtlar</button>
- <button data-tab="handover">Vardiya devir teslim</button>
-<button data-tab="minutes">Tutanak</button>
+<button data-tab="handover">Vardiya devir teslim</button>
+
+<details class="menu-group">
+  <summary>📊 Raporlar</summary>
+  <button data-tab="reports">Yönetim raporları</button>
+  <button data-tab="history">Geçmiş kayıtlar</button>
+</details>
+
+<details class="menu-group">
+  <summary>⚙ Diğer işlemler</summary>
+  <button data-tab="minutes">Tutanak</button>
   <button data-tab="notes">Notlar</button>
+</details>
  </nav>
 <section id="handover" class="panel hidden">
 <h2>Vardiya Devir Teslim</h2>
