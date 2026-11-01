@@ -72,6 +72,7 @@ input,select,textarea{background:#5A1738;color:#FFF4D2;border-color:#D9A441}
 <button data-tab="history">Geçmiş kayıtlar</button>
  <button data-tab="handover">Vardiya devir teslim</button>
 <button data-tab="minutes">Tutanak</button>
+  <button data-tab="notes">Notlar</button>
  </nav>
 <section id="handover" class="panel hidden">
 <h2>Vardiya Devir Teslim</h2>
@@ -141,7 +142,43 @@ input,select,textarea{background:#5A1738;color:#FFF4D2;border-color:#D9A441}
 <button class="secondary" id="printMinute">Tutanağı Yazdır / PDF</button>
 <div id="minuteMsg"></div>
 </section>
+<section id="notes" class="panel hidden">
+<h2>Notlar</h2>
+<p class="sub">Günlük ürün notları ve genel notlar</p>
 
+<div class="tabs">
+<button type="button" id="dailyProductTab" class="active">Günlük ürün notları</button>
+<button type="button" id="generalNotesTab">Genel notlar</button>
+</div>
+
+<div id="dailyProductNotes">
+<div class="notice">Ürün miktarlarını ve kontrol saatlerini buradan takip edin.</div>
+<div class="actions">
+<button class="secondary" id="enableNoteNotifications">Bildirim iznini aç</button>
+</div>
+<div class="tablewrap">
+<table style="min-width:720px">
+<thead>
+<tr><th>Ürün</th><th>Miktar</th><th>Birim</th><th>Kontrol saati</th></tr>
+</thead>
+<tbody id="dailyProductRows"></tbody>
+</table>
+</div>
+<div class="actions">
+<button class="primary" id="saveDailyProductNotes">Günlük notları kaydet</button>
+</div>
+<div id="dailyProductMsg"></div>
+</div>
+
+<div id="generalNotes" class="hidden">
+<label>Not başlığı</label>
+<input id="generalNoteTitle" placeholder="Not başlığı">
+<label>Not açıklaması</label>
+<textarea id="generalNoteText" rows="4"></textarea>
+<button class="primary" id="saveGeneralNote">Genel notu kaydet</button>
+<div id="generalNotesList"></div>
+</div>
+</section>
 <section id="checks" class="panel">
  <div class="stat"><span>Kontrol tamamlandı</span><strong id="doneCount">0 / 0</strong></div>
 
