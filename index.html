@@ -264,7 +264,8 @@ let data=JSON.parse(localStorage.getItem(key)||'{}');
 data.checks=data.checks||{};data.expiry=data.expiry||[];data.stock=data.stock||[];
 data.checkItems=Array.isArray(data.checkItems)?data.checkItems:defaultChecks.slice();
 data.dailyInfo=data.dailyInfo||{};data.history=data.history||{};data.staff=Array.isArray(data.staff)?data.staff:[];
-const today=()=>{const d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;};
+data.checkDetails=data.checkDetails||{};
+ const today=()=>{const d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;};
 function persist(){localStorage.setItem(key,JSON.stringify(data));render();}
 function daysUntil(date){return Math.ceil((new Date(date+'T00:00:00')-new Date(today()+'T00:00:00'))/86400000);}
 function renderChecks(){
@@ -272,7 +273,40 @@ function renderChecks(){
  document.getElementById('responsible').value=info.responsible||'';
  document.getElementById('dailyNotes').value=info.notes||'';
  const list=document.getElementById('checkList');
+
  list.innerHTML=data.checkItems.map((item,i)=>`<div class="row"><label><input type="checkbox" data-check="${i}" ${data.checks[today()]?.[i]?'checked':''}><span>${esc(item)}</span></label><button class="secondary" type="button" data-remove-check="${i}" aria-label="Bu maddeyi sil">Sil</button></div>`).join('') || '<div class="empty">Henüz kontrol maddesi yok. Yukarıdan yeni madde ekleyebilirsiniz.</div>';
+const detailDay=data.checkDetails[today()]||(data.checkDetails[today()]={});
+list.querySelectorAll('.row').forEach((row,i)=>{
+ const item=data.checkItems[i];
+ const saved=detailDay[item]||{note:'',photo:''};
+ const area=document.createElement('div');
+ area.style.width='100%';
+ area.innerHTML='<textarea rows="2" placeholder="Bu kontrol için not..."></textarea><input type="file" accept="image/*"><div></div>';
+ row.appendChild(area);
+ const note=area.querySelector('textarea');
+ const file=area.querySelector('input');
+ const preview=area.querySelector('div');
+ note.value=saved.note||'';
+ note.addEventListener('input',()=>{
+  detailDay[item]=detailDay[item]||{};
+  detailDay[item].note=note.value;
+  localStorage.setItem(key,JSON.stringify(data));
+ });
+ file.addEventListener('change',()=>{
+  const f=file.files[0];
+  if(!f)return;
+  if(f.size>1000000){alert('Fotoğraf 1 MB altında olmalı.');file.value='';return;}
+  const reader=new FileReader();
+  reader.onload=()=>{
+   detailDay[item]=detailDay[item]||{};
+   detailDay[item].photo=reader.result;
+   localStorage.setItem(key,JSON.stringify(data));
+   preview.innerHTML='<img src="'+reader.result+'" style="max-width:140px;border-radius:8px">';
+  };
+  reader.readAsDataURL(f);
+ });
+ if(saved.photo)preview.innerHTML='<img src="'+saved.photo+'" style="max-width:140px;border-radius:8px">';
+});
  list.querySelectorAll('input[type=checkbox]').forEach(el=>el.addEventListener('change',()=>{data.checks[today()]=data.checks[today()]||{};data.checks[today()][el.dataset.check]=el.checked;localStorage.setItem(key,JSON.stringify(data));renderStats();}));
  list.querySelectorAll('[data-remove-check]').forEach(el=>el.addEventListener('click',()=>{const i=Number(el.dataset.removeCheck);if(confirm('Bu kontrol maddesini listeden silmek istiyor musunuz?')){data.checkItems.splice(i,1);data.checks={};persist();}}));
 }
