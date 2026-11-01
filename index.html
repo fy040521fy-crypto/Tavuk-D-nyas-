@@ -116,8 +116,28 @@ button{
 <header><div class="brandline"><div class="brandmark" aria-label="Tavuk Dünyası temalı uygulama simgesi">TD</div><div><div class="brandname">RESTORAN OPERASYON PLATFORMU</div><h1>Akıllı Restoran Yönetim Sistemi</h1><p>Günlük operasyon · SKT takibi · Stok yönetimi · Raporlama</p></div><div style="margin-left:auto;display:flex;gap:8px;flex-wrap:wrap"><button class="secondary" id="backupExport">Yedeği indir</button><button class="secondary" id="backupImportBtn">Yedek yükle</button><input id="backupFile" type="file" accept="application/json" style="display:none"></div></div></header>
 <div id="pwaInstallBar" style="display:none;max-width:1120px;margin:12px auto;padding:0 16px"><button class="primary" id="pwaInstallBtn" style="width:100%">Uygulamayı telefona yükle</button></div>
 <main>
+ 
+<section id="dashboard" class="panel">
+  <h2>✨ Restoran Ana Paneli</h2>
+  <p class="sub">Günlük performans ve operasyon özeti</p>
+  <div class="stats">
+    <div class="stat"><span>Bugünkü ciro</span><strong id="dashTodayRevenue">₺0</strong></div>
+    <div class="stat"><span>Satış hedefi</span><strong id="dashTodayTarget">₺0</strong></div>
+    <div class="stat"><span>Hedef gerçekleşme</span><strong id="dashTodayRate">-%</strong></div>
+    <div class="stat"><span>Ürün adedi</span><strong id="dashTodayUnits">0</strong></div>
+    <div class="stat"><span>Aylık ciro</span><strong id="dashMonthRevenue">₺0</strong></div>
+  </div>
+  <h3>📊 Ürün satış grafiği</h3>
+  <div id="dashProductChart"></div>
+  <h3>🏆 Personel performans sıralaması</h3>
+  <div id="dashStaffRanking"></div>
+  <h3>📦 Stok durumu</h3>
+  <div id="dashStockCards"></div>
+</section>
+
  <nav class="tabs">
-<button class="active" data-tab="checks">Günlük kontroller</button>
+  <button class="active" data-tab="dashboard">🏠 Ana Sayfa</button>
+<button data-tab="checks">>Günlük kontroller</button>
 <button data-tab="expiry">SKT takibi</button>
 <button data-tab="stock">Stok takibi</button>
 <button data-tab="staff">Personel performansı</button>
@@ -236,7 +256,7 @@ button{
 <button class="primary" type="button" id="printAllNotes">Tüm notları A4 yazdır</button>
  </div>
 </section>
-<section id="checks" class="panel">
+<section id="checks" class="panel hidden">
  <div class="stat"><span>Kontrol tamamlandı</span><strong id="doneCount">0 / 0</strong></div>
 
  <h2>Günlük kontrol listesi</h2><p class="sub">Kontrol ettiğiniz maddeleri işaretleyin. İşaretler bu cihazdaki tarayıcıda saklanır.</p>
@@ -453,6 +473,7 @@ function render(){
  renderExpiry();
  renderStock();
  renderStats();
+ renderDashboardVisual();
 }
 function esc(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
 window.removeItem=(type,i)=>{if(confirm('Bu kaydı silmek istiyor musunuz?')){data[type].splice(i,1);persist();}};
@@ -530,8 +551,9 @@ area.remove();
 style.remove();
 },{once:true});
 };
- document.querySelectorAll('[data-tab]').forEach(b=>b.addEventListener('click',()=>{document.querySelectorAll('[data-tab]').forEach(x=>x.classList.toggle('active',x===b));['checks','expiry','stock','staff','reports','history','handover','minutes','notes'].forEach(id=>document.getElementById(id).classList.toggle('hidden',id!==b.dataset.tab));if(b.dataset.tab==='history')renderHistory();if(b.dataset.tab==='staff')renderStaff();if(b.dataset.tab==='reports')renderSalesReport();if(b.dataset.tab==='notes'){renderDailyProductNotes();renderGeneralNotes();}}));
-document.getElementById('addExpiry').onclick=()=>{let name=expName.value.trim(),date=expDate.value;if(!name||!date){alert('Ürün adı ve SKT girin.');return;}data.expiry.push({name,date,qty:expQty.value.trim()});expName.value='';expDate.value='';expQty.value='';persist();};
+ document.querySelectorAll('[data-tab]').forEach(b=>b.addEventListener('click',()=>{document.querySelectorAll('[data-tab]').forEach(x=>x.classList.toggle('active',x===b));['dashboard','checks','expiry','stock','staff','reports','history','handover','minutes','notes'].forEach(id=>document.getElementById(id).classList.toggle('hidden',id!==b.dataset.tab));if(b.dataset.tab==='history')renderHistory();if(b.dataset.tab==='staff')renderStaff();if(b.dataset.tab==='reports')renderSalesReport();if(b.dataset.tab==='notes'){renderDailyProductNotes();renderGeneralNotes();}}));
+ document.querySelectorAll('[data-tab="dashboard"]').forEach(b=>b.addEventListener('click',renderDashboardVisual));
+ document.getElementById('addExpiry').onclick=()=>{let name=expName.value.trim(),date=expDate.value;if(!name||!date){alert('Ürün adı ve SKT girin.');return;}data.expiry.push({name,date,qty:expQty.value.trim()});expName.value='';expDate.value='';expQty.value='';persist();};
 document.getElementById('addStock').onclick=()=>{
  const name=document.getElementById('stockName').value.trim();
  const qty=document.getElementById('stockQty').value;
@@ -762,7 +784,36 @@ function renderDashboard(){
  const labels=[['Başlangıç','start'],['K. Başlangıç','kstart'],['Çorba','soup'],['Tatlı','dessert'],['Ferahlatan içecek','drink']];
  document.getElementById('dashProductTotals').innerHTML=labels.map(([label,key])=>`<tr><td>${label}</td><td>${sum(todayRows,key)}</td><td>${sum(monthRows,key)}</td></tr>`).join('');
 }
-function renderStaff(){
+
+function renderDashboardVisual(){
+ const t=today(),month=t.slice(0,7);
+ const rows=data.staff.filter(x=>x.date===t);
+ const monthRows=data.staff.filter(x=>x.date&&x.date.slice(0,7)===month);
+ const sum=(arr,k)=>arr.reduce((a,x)=>a+Number(x[k]||0),0);
+ const rev=sum(rows,'revenue'),target=sum(rows,'target');
+ const units=arr=>arr.reduce((a,x)=>a+['start','kstart','soup','dessert','drink'].reduce((n,k)=>n+Number(x[k]||0),0),0);
+ document.getElementById('dashTodayRevenue').textContent=money(rev);
+ document.getElementById('dashTodayTarget').textContent=money(target);
+ document.getElementById('dashTodayRate').textContent=target?Math.round(rev/target*100)+'%':'-%';
+ document.getElementById('dashTodayUnits').textContent=units(rows).toLocaleString('tr-TR');
+ document.getElementById('dashMonthRevenue').textContent=money(sum(monthRows,'revenue'));
+ const labels=[['Başlangıç','start'],['K. Başlangıç','kstart'],['Çorba','soup'],['Tatlı','dessert'],['İçecek','drink']];
+ document.getElementById('dashProductChart').innerHTML=labels.map(([name,key])=>{
+  const n=sum(rows,key),max=Math.max(1,...labels.map(x=>sum(rows,x[1])));
+  return `<div style="margin:12px 0"><b>${name} — ${n}</b><div style="height:12px;background:#292039;border-radius:20px;overflow:hidden"><div style="height:100%;width:${n/max*100}%;background:linear-gradient(90deg,#812be0,#d879ff);border-radius:20px"></div></div></div>`;
+ }).join('');
+ const people={};
+ rows.forEach(x=>people[x.name]=(people[x.name]||0)+Number(x.revenue||0));
+ const ranking=Object.entries(people).sort((a,b)=>b[1]-a[1]);
+ document.getElementById('dashStaffRanking').innerHTML=ranking.length?ranking.map((x,i)=>`<div class="row"><b>${i+1}. ${esc(x[0])}</b><span>${money(x[1])}</span></div>`).join(''):'Henüz bugünkü personel kaydı yok.';
+ document.getElementById('dashStockCards').innerHTML=data.stock.length?data.stock.map(x=>{
+  const low=Number(x.qty)<=Number(x.min);
+  const pct=Number(x.min)>0?Math.min(100,Number(x.qty)/Number(x.min)*100):100;
+  return `<div class="stat"><b>${esc(x.name)}</b><strong>${x.qty} ${esc(x.unit||'adet')}</strong><span>${low?'⚠️ Stok az':'✓ Stok yeterli'}</span><div style="height:8px;background:#292039;border-radius:20px;overflow:hidden"><div style="height:100%;width:${pct}%;background:${low?'#ff657a':'#42d9a0'}"></div></div></div>`;
+ }).join(''):'Henüz stok kaydı yok.';
+}
+
+ function renderStaff(){
  const date=document.getElementById('staffFilterDate').value;
  const name=document.getElementById('staffFilterName').value.trim().toLocaleLowerCase('tr-TR');
  const rows=data.staff.filter(x=>(!date||x.date===date)&&(!name||x.name.toLocaleLowerCase('tr-TR').includes(name))).sort((a,b)=>b.date.localeCompare(a.date)||Number(b.revenue)-Number(a.revenue));
