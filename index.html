@@ -421,21 +421,49 @@ function showHistory(date){
  document.getElementById('printOldReport').onclick=()=>makeReport(h);
 }
 function makeReport(h){
- const date=h.date||today(),checks=h.checks||[],done=checks.filter(x=>x.ok).length,missing=checks.length-done;
- const expRows=(h.expiry||[]).map(x=>{const d=daysUntil(x.date);return `<tr><td>${esc(x.name)}</td><td>${esc(x.date)}</td><td>${esc(x.qty||'-')}</td><td>${d<0?'Tarihi geçmiş':d===0?'Bugün':d+' gün kaldı'}</td></tr>`}).join('');
- const stockRows=(h.stock||[]).map(x=>`<tr><td>${esc(x.name)}</td><td>${esc(x.qty)}</td><td>${esc(x.min)}</td><td>${Number(x.qty)<=Number(x.min)?'Sipariş kontrolü gerekli':'Yeterli'}</td></tr>`).join('');
+ const date=h.date||today();
+ const checks=h.checks||[];
+ const done=checks.filter(x=>x.ok).length;
+ const missing=checks.length-done;
+ const detailDay=data.checkDetails[date]||{};
+
+ const checkRows=checks.map(x=>{
+  const detail=detailDay[x.name]||{};
+  const note=esc(detail.note||'Not girilmedi.');
+  const photo=detail.photo?
+   `<div style="margin:8px 0"><img src="${detail.photo}" style="max-width:220px;max-height:180px;object-fit:contain"></div>`:'';
+  return `<tr><td>${esc(x.name)}</td><td>${x.ok?'Tamamlandı':'Eksik'}</td><td>${note}${photo}</td></tr>`;
+ }).join('');
+
+ const expRows=(h.expiry||[]).map(x=>{
+  const d=daysUntil(x.date);
+  return `<tr><td>${esc(x.name)}</td><td>${esc(x.date)}</td><td>${esc(x.qty||'-')}</td><td>${d<0?'Tarihi geçmiş':d===0?'Bugün':d+' gün kaldı'}</td></tr>`;
+ }).join('');
+
+ const stockRows=(h.stock||[]).map(x=>
+  `<tr><td>${esc(x.name)}</td><td>${esc(x.qty)}</td><td>${esc(x.min)}</td><td>${Number(x.qty)<=Number(x.min)?'Sipariş kontrolü gerekli':'Yeterli'}</td></tr>`
+ ).join('');
+
  const report=document.getElementById('printReport');
- report.innerHTML=`<div class="report-head"><h1>TAVUK DÜNYASI · RESTORAN GÜNLÜK RAPORU</h1><p>GÜNLÜK OPERASYON VE KONTROL FORMU</p></div>
+ report.innerHTML=`<div class="report-head">
+ <h1>TAVUK DÜNYASI · RESTORAN GÜNLÜK RAPORU</h1>
+ <p>GÜNLÜK OPERASYON VE KONTROL FORMU</p></div>
  <div class="report-meta"><span><b>Tarih:</b> ${fmtDate(date)}</span><span><b>Kontrolü yapan:</b> ${esc(h.responsible||'Belirtilmedi')}</span></div>
- <h3>1. Günlük kontroller</h3><table><thead><tr><th>Kontrol maddesi</th><th>Durum</th></tr></thead><tbody>${checks.map(x=>`<tr><td>${esc(x.name)}</td><td>${x.ok?'Tamamlandı':'Eksik'}</td></tr>`).join('')||'<tr><td colspan="2">Kontrol maddesi bulunmuyor.</td></tr>'}</tbody></table>
+ <h3>1. Günlük kontroller, notlar ve fotoğraflar</h3>
+ <table><thead><tr><th>Kontrol maddesi</th><th>Durum</th><th>Açıklama ve fotoğraf</th></tr></thead><tbody>${checkRows||'<tr><td colspan="3">Kontrol maddesi bulunmuyor.</td></tr>'}</tbody></table>
  <p><b>Özet:</b> ${done} tamamlandı · ${missing} eksik · Toplam ${checks.length} madde</p>
- <h3>2. Günlük açıklamalar ve yapılan işlemler</h3><div class="notes">${esc(h.notes||'Açıklama girilmedi.').replace(/\n/g,'<br>')}</div>
- <h3>3. SKT takip kayıtları</h3><table><thead><tr><th>Ürün</th><th>SKT</th><th>Miktar</th><th>Durum</th></tr></thead><tbody>${expRows||'<tr><td colspan="4">SKT kaydı yok.</td></tr>'}</tbody></table>
- <h3>4. Stok durumu</h3><table><thead><tr><th>Ürün</th><th>Mevcut</th><th>Minimum</th><th>Durum</th></tr></thead><tbody>${stockRows||'<tr><td colspan="4">Stok kaydı yok.</td></tr>'}</tbody></table>
+ <h3>2. Günlük açıklamalar ve yapılan işlemler</h3>
+ <div class="notes">${esc(h.notes||'Açıklama girilmedi.').replace(/\n/g,'<br>')}</div>
+ <h3>3. SKT takip kayıtları</h3>
+ <table><thead><tr><th>Ürün</th><th>SKT</th><th>Miktar</th><th>Durum</th></tr></thead><tbody>${expRows||'<tr><td colspan="4">SKT kaydı yok.</td></tr>'}</tbody></table>
+ <h3>4. Stok durumu</h3>
+ <table><thead><tr><th>Ürün</th><th>Mevcut</th><th>Minimum</th><th>Durum</th></tr></thead><tbody>${stockRows||'<tr><td colspan="4">Stok kaydı yok.</td></tr>'}</tbody></table>
  <div class="signatures"><div>Kontrolü yapan imza</div><div>Müdür imza</div></div>
  <p class="report-foot">Bu rapor, seçilen tarihte kaydedilmiş günlük kayıtlar esas alınarak oluşturulmuştur.</p>`;
- report.classList.remove('hidden');window.print();
+ report.classList.remove('hidden');
+ window.print();
 }
+
 document.getElementById('viewHistory').onclick=()=>{const d=document.getElementById('historyDate').value;if(!d){alert('Lütfen görüntülemek için bir tarih seçin.');return;}showHistory(d);};
 document.getElementById('makeReport').onclick=()=>{snapshotToday();makeReport(data.history[today()]);};
 document.getElementById('saveChecks').onclick=()=>{snapshotToday();document.getElementById('checkMsg').textContent='Bugünkü kontrol, açıklamalar, SKT ve stok durumu bu cihazda geçmiş kaydı olarak saklandı.';};
