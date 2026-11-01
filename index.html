@@ -1351,5 +1351,22 @@ main {
   #dashProductChart>div {height:120px!important}
   #dashStaffRanking>div {grid-template-columns:repeat(2,minmax(0,1fr))!important}
 }
-</style></body></html>
+/* ANA EKRAN SON DUZENLEME */
+.stats{
+  grid-template-columns:repeat(4,minmax(0,1fr))!important;
+}
+.stats .stat:nth-child(2){
+  display:none!important;
+}
+.dash-grid{
+  grid-template-columns:repeat(3,minmax(0,1fr))!important;
+}
+@media (orientation:landscape){
+  .stats{grid-template-columns:repeat(4,minmax(0,1fr))!important}
+  .dash-grid{grid-template-columns:repeat(3,minmax(0,1fr))!important}
+}
+@media (max-width:600px) and (orientation:portrait){
+  .stats{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+  .dash-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+}</style></body></html>
 <script>if('serviceWorker' in navigator && location.protocol!=='file:'){window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{}));}</script>
