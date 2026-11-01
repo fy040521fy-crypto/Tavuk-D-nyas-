@@ -461,13 +461,21 @@ const permission=await Notification.requestPermission();
   alert(permission==='granted'?'Bildirim izni açıldı.':'Bildirim izni verilmedi.');
 };
 document.getElementById('printAllNotes').onclick=()=>{
-const w=window.open('','','width=900,height=700');
 const products=document.querySelector('#dailyProductRows').closest('table').outerHTML;
 const general=document.getElementById('generalNotesList').innerHTML;
-w.document.write('<html><head><title>Notlar</title><style>body{font-family:Arial;padding:20px;color:#222}h1,h2{margin-bottom:12px}table{width:100%;border-collapse:collapse}td,th{border:1px solid #999;padding:8px;text-align:left}.panel{border:1px solid #999;padding:12px;margin:10px 0}img{max-width:250px;max-height:180px}</style></head><body><h1>Günlük Ürün Notları</h1>'+products+'<h1>Genel Notlar</h1>'+general+'</body></html>');
-w.document.close();
-w.focus();
-setTimeout(()=>w.print(),1000);
+const area=document.createElement('div');
+area.id='allNotesPrint';
+area.innerHTML='<h1>Günlük Ürün Notları</h1>'+products+'<h1>Genel Notlar</h1>'+general;
+const style=document.createElement('style');
+style.id='allNotesPrintStyle';
+style.textContent='@media print{body>*{visibility:hidden!important}#allNotesPrint,#allNotesPrint *{visibility:visible!important}#allNotesPrint{position:absolute;left:0;top:0;width:100%;padding:15px;background:white;color:black;font-family:Arial}#allNotesPrint table{width:100%;border-collapse:collapse}#allNotesPrint td,#allNotesPrint th{border:1px solid #999;padding:7px;text-align:left}#allNotesPrint img{max-width:220px;max-height:160px}}';
+document.body.appendChild(area);
+document.head.appendChild(style);
+window.print();
+window.addEventListener('afterprint',()=>{
+area.remove();
+style.remove();
+},{once:true});
 };
  document.querySelectorAll('[data-tab]').forEach(b=>b.addEventListener('click',()=>{document.querySelectorAll('[data-tab]').forEach(x=>x.classList.toggle('active',x===b));['checks','expiry','stock','staff','reports','history','handover','minutes','notes'].forEach(id=>document.getElementById(id).classList.toggle('hidden',id!==b.dataset.tab));if(b.dataset.tab==='history')renderHistory();if(b.dataset.tab==='staff')renderStaff();if(b.dataset.tab==='reports')renderSalesReport();if(b.dataset.tab==='notes'){renderDailyProductNotes();renderGeneralNotes();}}));
 document.getElementById('addExpiry').onclick=()=>{let name=expName.value.trim(),date=expDate.value;if(!name||!date){alert('Ürün adı ve SKT girin.');return;}data.expiry.push({name,date,qty:expQty.value.trim()});expName.value='';expDate.value='';expQty.value='';persist();};
