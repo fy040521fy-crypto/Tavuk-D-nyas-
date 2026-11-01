@@ -59,7 +59,7 @@
       data.stock = data.stock || [];
       data.checkItems = Array.isArray(data.checkItems) ? data.checkItems : [];
       data.dailyInfo = data.dailyInfo || {};
-      data.history = data.history || {};
+      data.history = data.history || {};data.checkDetails = data.checkDetails || {};
       data.staff = Array.isArray(data.staff) ? data.staff : [];
       if (typeof render === 'function') render();
     }
