@@ -168,12 +168,32 @@ input,select,textarea{background:#5A1738;color:#FFF4D2;border-color:#D9A441}
  <div id="expiryNotice"></div><div class="tablewrap"><table><thead><tr><th>Ürün</th><th>SKT</th><th>Miktar</th><th>Durum</th><th></th></tr></thead><tbody id="expiryRows"></tbody></table></div>
 </section>
 <section id="stock" class="panel hidden">
- <h2>Stok takip listesi</h2><p class="sub">Mevcut miktarı ve minimum stok seviyesini girin.</p>
- <div class="formgrid">
-  <input id="stockName" placeholder="Ürün adı"><input id="stockQty" type="number" min="0" step="any" placeholder="Mevcut miktar">
-  <input id="stockMin" type="number" min="0" step="any" placeholder="Minimum miktar"><button class="primary" id="addStock">Stok ekle</button>
- </div>
- <div id="stockNotice"></div><div class="tablewrap"><table><thead><tr><th>Ürün</th><th>Mevcut</th><th>Minimum</th><th>Durum</th><th></th></tr></thead><tbody id="stockRows"></tbody></table></div>
+<h2>Stok takip listesi</h2>
+<p class="sub">Ürün miktarlarını takip edin, giriş ve çıkışları kaydedin.</p>
+<div class="formgrid">
+<input id="stockName" placeholder="Ürün adı">
+<input id="stockQty" type="number" min="0" step="any" placeholder="Mevcut miktar">
+<select id="stockUnit">
+<option value="adet">Adet</option>
+<option value="paket">Paket</option>
+<option value="kg">Kg</option>
+<option value="gram">Gram</option>
+<option value="litre">Litre</option>
+<option value="koli">Koli</option>
+<option value="şişe">Şişe</option>
+</select>
+<input id="stockMin" type="number" min="0" step="any" placeholder="Minimum miktar">
+<button class="primary" id="addStock">Stok ekle</button>
+</div>
+<div id="stockNotice"></div>
+<div class="tablewrap">
+<table>
+<thead><tr><th>Ürün</th><th>Mevcut</th><th>Minimum</th><th>Durum</th><th>İşlem</th></tr></thead>
+<tbody id="stockRows"></tbody>
+</table>
+</div>
+<h3>Stok hareket geçmişi</h3>
+<div id="stockMovementHistory"></div>
 </section>
 
 <section id="staff" class="panel hidden">
@@ -263,9 +283,35 @@ function renderExpiry(){
  document.getElementById('expiryNotice').innerHTML=urgent?`<div class="notice danger">${urgent} ürünün SKT tarihi geçmiş veya 3 gün içinde doluyor. Ürünleri kontrol edin ve işletme prosedürünü uygulayın.</div>`:'';
 }
 function renderStock(){
- document.getElementById('stockRows').innerHTML=data.stock.length?data.stock.map((x,i)=>{let low=Number(x.qty)<=Number(x.min);return `<tr><td>${esc(x.name)}</td><td>${x.qty}</td><td>${x.min}</td><td>${low?'Minimum seviyede / altında':'Yeterli'}</td><td><button class="secondary" onclick="removeItem('stock',${i})">Sil</button></td></tr>`}).join(''):'<tr><td colspan="5" class="empty">Henüz stok eklenmedi.</td></tr>';
+ const rows=document.getElementById('stockRows');
+ rows.innerHTML=data.stock.length?data.stock.map((x,i)=>{
+ const low=Number(x.qty)<=Number(x.min);
+ return `<tr>
+ <td>${esc(x.name)}</td>
+ <td>${x.qty} ${esc(x.unit||'adet')}</td>
+ <td>${x.min} ${esc(x.unit||'adet')}</td>
+ <td>${low?'Minimum seviyede / altında':'Yeterli'}</td>
+ <td>
+ <button class="secondary" onclick="changeStock(${i},'in')">+ Ekle</button>
+ <button class="secondary" onclick="changeStock(${i},'out')">− Düş</button>
+ <button class="secondary" onclick="removeItem('stock',${i})">Sil</button>
+ </td></tr>`;
+ }).join(''):'<tr><td colspan="5" class="empty">Henüz stok eklenmedi.</td></tr>';
  const low=data.stock.filter(x=>Number(x.qty)<=Number(x.min)).length;
- document.getElementById('stockNotice').innerHTML=low?`<div class="notice">${low} ürün minimum stok seviyesinde veya altında. Sipariş ihtiyacını kontrol edin.</div>`:'';
+ document.getElementById('stockNotice').innerHTML=low?`<div class="notice">${low} ürün minimum stok seviyesinde veya altında.</div>`:'';
+ const history=data.stock.flatMap(x=>(x.movements||[]).map(m=>({...m,name:x.name})));
+ document.getElementById('stockMovementHistory').innerHTML=history.length?history.reverse().map(m=>`<div class="row">${esc(m.name)} — ${m.type==='in'?'Giriş':'Çıkış'}: ${m.amount} ${esc(m.unit)} | Kalan: ${m.after}</div>`).join(''):'Henüz stok hareketi yok.';
+}
+function changeStock(i,type){
+ const x=data.stock[i];
+ const amount=Number(prompt('İşlem miktarını girin ('+(x.unit||'adet')+')'));
+ if(!Number.isFinite(amount)||amount<=0)return;
+ const before=Number(x.qty);
+ if(type==='out'&&amount>before){alert('Stokta bu kadar ürün yok!');return;}
+ x.qty=type==='in'?before+amount:before-amount;
+ x.movements=x.movements||[];
+ x.movements.push({type,amount,before,after:x.qty,unit:x.unit||'adet',date:new Date().toISOString()});
+ persist();
 }
  function renderStats(){
  const done=Object.values(data.checks[today()]||{}).filter(Boolean).length;
@@ -283,7 +329,20 @@ function esc(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;',
 window.removeItem=(type,i)=>{if(confirm('Bu kaydı silmek istiyor musunuz?')){data[type].splice(i,1);persist();}};
 document.querySelectorAll('[data-tab]').forEach(b=>b.addEventListener('click',()=>{document.querySelectorAll('[data-tab]').forEach(x=>x.classList.toggle('active',x===b));['checks','expiry','stock','staff','reports','history','handover','minutes'].forEach(id=>document.getElementById(id).classList.toggle('hidden',id!==b.dataset.tab));if(b.dataset.tab==='history')renderHistory();if(b.dataset.tab==='staff')renderStaff();if(b.dataset.tab==='reports')renderSalesReport();}));
 document.getElementById('addExpiry').onclick=()=>{let name=expName.value.trim(),date=expDate.value;if(!name||!date){alert('Ürün adı ve SKT girin.');return;}data.expiry.push({name,date,qty:expQty.value.trim()});expName.value='';expDate.value='';expQty.value='';persist();};
-document.getElementById('addStock').onclick=()=>{let name=stockName.value.trim(),qty=stockQty.value,min=stockMin.value;if(!name||qty===''||min===''){alert('Ürün adı, mevcut miktar ve minimum miktarı girin.');return;}data.stock.push({name,qty,min});stockName.value='';stockQty.value='';stockMin.value='';persist();};
+document.getElementById('addStock').onclick=()=>{
+ const name=document.getElementById('stockName').value.trim();
+ const qty=document.getElementById('stockQty').value;
+ const min=document.getElementById('stockMin').value;
+ const unit=document.getElementById('stockUnit').value;
+ if(!name||qty===''||min===''){alert('Ürün adı ve miktarları girin.');return;}
+ if(!Number.isFinite(Number(qty))||!Number.isFinite(Number(min))||Number(qty)<0||Number(min)<0){alert('Geçerli miktar girin.');return;}
+ const amount=Number(qty);
+ data.stock.push({name,qty:amount,min:Number(min),unit,movements:amount>0?[{type:'in',amount,before:0,after:amount,unit,date:new Date().toISOString()}]:[]});
+ document.getElementById('stockName').value='';
+ document.getElementById('stockQty').value='';
+ document.getElementById('stockMin').value='';
+ persist();
+};
 document.getElementById('addCheck').onclick=()=>{const input=document.getElementById('newCheck');const value=input.value.trim();if(!value){alert('Lütfen bir kontrol maddesi yazın.');return;}if(data.checkItems.some(x=>x.toLocaleLowerCase('tr-TR')===value.toLocaleLowerCase('tr-TR'))){alert('Bu madde zaten listede var.');return;}data.checkItems.push(value);input.value='';persist();};
 document.getElementById('newCheck').addEventListener('keydown',e=>{if(e.key==='Enter')document.getElementById('addCheck').click();});
 document.getElementById('resetChecks').onclick=()=>{if(confirm('Bugünkü işaretleri sıfırlamak istiyor musunuz?')){delete data.checks[today()];persist();}};
