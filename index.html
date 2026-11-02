@@ -795,31 +795,79 @@ button{
 
       if(!todayOff)dailyGoal+=dailyTarget;
 
-      cardsHTML+=`
-        <div class="target-card" style="margin-bottom:10px">
-          <div style="display:flex;justify-content:space-between;gap:8px">
-            <b>${escapeTM(name)}</b>
-            <b style="color:${pct>=100?'#34d399':'#f5cf62'}">${pct}%</b>
+      
+const colors=['#a78bfa','#2dd4bf','#fb923c','#60a5fa','#f472b6','#facc15'];
+const color=colors[names.indexOf(name)%colors.length];
+const share=totalStaffWorkDays?workDays/totalStaffWorkDays:0;
+const goals=data.monthlyGoals||{};
+const sumKey=k=>personRows.reduce((s,x)=>s+Number(x[k]||0),0);
+const metrics=[
+  ['Başlangıç',Number(goals.goalPlates||0)*0.10,'start','🟣'],
+  ['K. Başlangıç',null,'kstart','🔵'],
+  ['Çorba',Number(goals.goalSoup||0),'soup','🥣'],
+  ['Tatlı',Number(goals.goalDessert||0),'dessert','🍰'],
+  ['İçecek',Number(goals.goalPlates||0)*0.25,'drink','🥤']
+];
+const metricHTML=metrics.map(([label,goal,key,emoji])=>{
+  const sold=sumKey(key);
+  const personalGoal=goal===null?null:Math.round(goal*share);
+  const rate=personalGoal?Math.round(sold/personalGoal*100):0;
+  return `
+    <div style="background:#29252d;border-radius:12px;padding:10px;min-width:0">
+      <div style="font-size:12px">${emoji} ${label}</div>
+      <div style="font-size:16px;font-weight:800;margin:5px 0;overflow-wrap:anywhere">
+        ${sold} ${personalGoal===null?'adet':'/ '+personalGoal}
+      </div>
+      <div style="height:7px;background:#49434b;border-radius:9px;overflow:hidden">
+        <div style="height:100%;width:${Math.min(100,rate)}%;background:${color}"></div>
+      </div>
+      <small>${personalGoal===null?'Satış adedi':rate+'% gerçekleşti'}</small>
+    </div>`;
+}).join('');
+
+cardsHTML+=`
+  <details style="border:1px solid ${color};border-radius:15px;padding:12px;margin-bottom:9px;background:#1d1a20;color:white">
+    <summary style="cursor:pointer;list-style:none">
+      <div style="display:flex;align-items:center;gap:12px">
+        <div style="width:54px;height:54px;flex-shrink:0;border-radius:50%;display:grid;place-items:center;background:conic-gradient(${color} ${Math.min(100,pct)}%,#454049 0);color:white;font-weight:900">
+          ${pct}%
+        </div>
+        <div style="min-width:0;flex:1">
+          <strong style="font-size:17px">${escapeTM(name)}</strong>
+          <div style="font-size:12px;color:#c5bec9;margin-top:4px">
+            Bugün: ${moneyTM(todayActual)}
           </div>
-          <div class="target-grid" style="margin-top:10px">
-            <div>Aylık hedef<strong>${moneyTM(target)}</strong></div>
-            <div>Gerçekleşen<strong>${moneyTM(actual)}</strong></div>
-            <div>Kalan<strong>${moneyTM(remaining)}</strong></div>
-            <div>Günlük hedef<strong>${moneyTM(dailyTarget)}</strong></div>
+          <div style="font-size:11px;color:${color};margin-top:4px">
+            ${todayOff?'BUGÜN İZİNLİ':'Detayları aç ▾'}
           </div>
-          <div class="target-progress">
-            <span style="width:${Math.min(100,pct)}%"></span>
-          </div>
-          <p class="sub" style="margin:8px 0">
-            İzin: ${dayOff===7?'Belirlenmedi':days[dayOff]}
-            · Çalışma günü: ${workDays}
-            · Bugünkü satış: ${moneyTM(todayActual)}
-            ${todayOff?' · BUGÜN İZİNLİ':''}
-          </p>
-          <button class="secondary" data-edit-target="${escapeTM(key)}">
-            Hedefi düzenle
-          </button>
-        </div>`;
+        </div>
+      </div>
+    </summary>
+    <div style="margin-top:14px">
+      <div style="background:#29252d;padding:12px;border-radius:12px">
+        <div style="font-size:12px;color:${color}">💰 AYLIK CİRO</div>
+        <div style="font-size:20px;font-weight:900;overflow-wrap:anywhere">${moneyTM(actual)}</div>
+        <div style="font-size:12px;margin:7px 0;overflow-wrap:anywhere">
+          Hedef: ${moneyTM(target)}
+        </div>
+        <div style="height:9px;background:#49434b;border-radius:9px;overflow:hidden">
+          <div style="height:100%;width:${Math.min(100,pct)}%;background:${color}"></div>
+        </div>
+        <div style="font-size:12px;margin-top:8px">
+          Kalan: ${moneyTM(remaining)}
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:10px">
+        ${metricHTML}
+      </div>
+      <p style="font-size:12px;margin-top:12px">
+        İzin: ${days[dayOff]} · Çalışma günü: ${workDays}
+      </p>
+      <p style="font-size:12px">Günlük ciro hedefi: ${moneyTM(dailyTarget)}</p>
+      <button class="secondary" data-edit-target="${escapeTM(key)}">İzin gününü düzenle</button>
+    </div>
+  </details>`;
+
 
       dailyHTML+=`
         <div class="row">
