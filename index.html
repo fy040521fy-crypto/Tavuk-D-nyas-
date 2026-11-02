@@ -1742,6 +1742,38 @@ h1,h2,h3{
   grid-template-columns:repeat(3,minmax(0,1fr))!important;
  }
 }
-
+/* GRAFİKLERİ KOMPAKTLAŞTIR */
+#dashboard .premium-graphs{
+  display:grid!important;
+  grid-template-columns:repeat(3,minmax(0,1fr))!important;
+  gap:9px!important;
+}
+#dashboard .dash-card{
+  min-height:145px!important;
+  height:auto!important;
+  padding:10px!important;
+  border-radius:13px!important;
+}
+#dashboard .dash-card h3{
+  font-size:12px!important;
+  margin:0 0 7px!important;
+}
+#dashboard .dash-card svg{
+  max-height:85px!important;
+}
+#dashboard .dash-card strong{
+  font-size:17px!important;
+}
+#dashboard .dash-card small{
+  font-size:9px!important;
+}
+#dashboard .sub{
+  display:none!important;
+}
+@media(max-width:600px) and (orientation:landscape){
+  #dashboard .premium-graphs{
+    grid-template-columns:repeat(3,minmax(0,1fr))!important;
+  }
+  }
 </style></body></html>
 <script>if('serviceWorker' in navigator && location.protocol!=='file:'){window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{}));}</script>
