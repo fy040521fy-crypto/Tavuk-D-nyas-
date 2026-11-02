@@ -356,6 +356,25 @@ button{
   <div class="dash-card"><h3>🏆 Personel Performansı</h3><div id="dashStaffRanking"></div></div>
   <div class="dash-card dash-span"><h3>📦 Stok Durumu</h3><div id="dashStockCards"></div></div>
 
+<div class="dash-card" style="margin-top:14px;border:1px solid #d9a441;padding:14px">
+  <h3>🍽️ Günlük Tabak Girişi</h3>
+  <div class="formgrid">
+    <label>Tarih
+      <input id="plateEntryDate" type="date">
+    </label>
+    <label>Günlük tabak sayısı
+      <input id="plateEntryCount" type="number" min="0" step="1" placeholder="Örn. 650">
+    </label>
+  </div>
+  <button class="primary" id="savePlateEntry" style="width:100%;margin-top:10px">Tabak Sayısını Kaydet</button>
+  <div class="stats" style="margin-top:12px">
+    <div class="stat"><span>Bugünkü tabak</span><strong id="plateTodayTotal">0</strong></div>
+    <div class="stat"><span>Bu ay toplam</span><strong id="plateMonthTotal">0</strong></div>
+    <div class="stat"><span>Aylık hedefe kalan</span><strong id="plateRemaining">0</strong></div>
+  </div>
+  <div id="plateEntryHistory"></div>
+</div>
+
   <div style="display:none">
     <div id="dashSalesDistribution"></div>
     <div id="dashProductChart"></div>
