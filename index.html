@@ -637,13 +637,13 @@ button{
     <input id="tmName" list="tmStaffList" placeholder="Personel adını yazın">
     <datalist id="tmStaffList"></datalist>
 
-    <label>Aylık ciro hedefi (₺)</label>
-    <input id="tmMonthlyTarget" type="number" min="0" placeholder="Örn. 350000">
+    <label>Otomatik hesaplanan aylık ciro hedefi</label>
+<input id="tmMonthlyTarget" type="text" readonly placeholder="Genel hedeften hesaplanır">
 
     <label>Haftalık izin günü</label>
     <select id="tmDayOff">
-      <option value="7">İzin günü belirlenmedi</option>
-      <option value="1">Pazartesi</option>
+      <option value="1" selected>Pazartesi</option>
+      
       <option value="2">Salı</option>
       <option value="3">Çarşamba</option>
       <option value="4">Perşembe</option>
@@ -751,22 +751,32 @@ button{
 
     names.sort((a,b)=>a.localeCompare(b,'tr'));
 
+        const workDaysByPerson={};
+    let totalStaffWorkDays=0;
+
     names.forEach(name=>{
       const key=nameKey(name);
-      const config=data.staffTargets[key]||{
-        name,monthlyTarget:0,dayOff:7
-      };
-
-      const target=Number(config.monthlyTarget||0);
-      const dayOff=Number(config.dayOff??7);
-
+      const config=data.staffTargets[key]||{name,dayOff:1};
+      const dayOff=Number(config.dayOff??1)===7?1:Number(config.dayOff??1);
       let workDays=0;
+
       for(let d=1;d<=daysInMonth;d++){
-        if(dayOff===7||new Date(year,month,d).getDay()!==dayOff){
+        if(new Date(year,month,d).getDay()!==dayOff){
           workDays++;
         }
       }
 
+      workDaysByPerson[key]=workDays;
+      totalStaffWorkDays+=workDays;
+    });
+
+    names.forEach(name=>{
+      const key=nameKey(name);
+      const config=data.staffTargets[key]||{name,dayOff:1};
+      const dayOff=Number(config.dayOff??1)===7?1:Number(config.dayOff??1);
+      const workDays=workDaysByPerson[key]||0;
+      const target=totalStaffWorkDays
+        ? generalGoal*workDays/totalStaffWorkDays : 0;
       const personRows=monthlyRows.filter(x=>
         nameKey(x.name)===key
       );
@@ -847,28 +857,25 @@ button{
     }[c]));
   }
 
-  document.getElementById('tmSave').onclick=()=>{
+    document.getElementById('tmSave').onclick=()=>{
     const name=document.getElementById('tmName').value.trim();
-    const target=document.getElementById('tmMonthlyTarget').value;
     const dayOff=Number(document.getElementById('tmDayOff').value);
 
-    if(!name||target===''||!Number.isFinite(Number(target))||
-       Number(target)<0){
-      alert('Personel adı ve geçerli aylık hedef girin.');
+    if(!name){
+      alert('Personel adını girin.');
       return;
     }
 
     data.staffTargets=data.staffTargets||{};
     data.staffTargets[nameKey(name)]={
       name,
-      monthlyTarget:Number(target),
       dayOff
     };
 
     persist();
     renderTargetManagement();
 
-    alert('Personel hedefi ve haftalık izin kaydedildi.');
+    alert('Personel ve haftalık izin kaydedildi. Hedef otomatik hesaplanacak.');
     document.getElementById('tmName').value='';
     document.getElementById('tmMonthlyTarget').value='';
   };
@@ -994,6 +1001,7 @@ function render(){
  renderStock();
  renderStats();
  renderDashboardVisual();
+  if(window.renderTargetManagement)window.renderTargetManagement();
 }
 function esc(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
 window.removeItem=(type,i)=>{if(confirm('Bu kaydı silmek istiyor musunuz?')){data[type].splice(i,1);persist();}};
