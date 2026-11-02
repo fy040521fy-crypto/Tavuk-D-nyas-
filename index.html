@@ -1606,7 +1606,76 @@ document.getElementById('reportFrom').addEventListener('change',renderSalesRepor
 document.getElementById('reportTo').addEventListener('change',renderSalesReport);
 document.getElementById('printSalesReport').onclick=()=>{renderSalesReport();window.print();};
 document.getElementById('exportSalesReport').onclick=()=>{renderSalesReport();const from=document.getElementById('reportFrom').value,to=document.getElementById('reportTo').value;const rows=data.staff.filter(x=>x.date>=from&&x.date<=to);const headers=['Tarih','Personel','Başlangıç','K. Başlangıç','Çorba','Tatlı','Ferahlatan içecek','Ciro','Hedef'];const lines=[headers,...rows.map(x=>[x.date,x.name,x.start,x.kstart,x.soup,x.dessert,x.drink,x.revenue,x.target])];const csv='\ufeff'+lines.map(r=>r.map(v=>'"'+String(v??'').replace(/"/g,'""')+'"').join(';')).join('\r\n');const a=document.createElement('a'),url=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));a.href=url;a.download=`yonetim-raporu-${from}-${to}.csv`;a.click();URL.revokeObjectURL(url);};
+// GÜNLÜK TABAK KAYIT SİSTEMİ
+data.plateEntries = Array.isArray(data.plateEntries) ? data.plateEntries : [];
 
+const plateDate = document.getElementById('plateEntryDate');
+const plateCount = document.getElementById('plateEntryCount');
+
+plateDate.value = today();
+
+function updatePlateTotals(){
+  const date = plateDate.value;
+  const month = date.slice(0,7);
+
+  const daily = data.plateEntries
+    .filter(x => x.date === date)
+    .reduce((s,x) => s + Number(x.count || 0), 0);
+
+  const monthly = data.plateEntries
+    .filter(x => x.date.slice(0,7) === month)
+    .reduce((s,x) => s + Number(x.count || 0), 0);
+
+  const goal = Number(data.monthlyGoals.goalPlates || 0);
+
+  document.getElementById('plateTodayTotal').textContent = daily;
+  document.getElementById('plateMonthTotal').textContent = monthly;
+  document.getElementById('plateRemaining').textContent = Math.max(0,goal-monthly);
+
+  document.getElementById('plateEntryHistory').innerHTML =
+    data.plateEntries.filter(x=>x.date.slice(0,7)===month)
+    .sort((a,b)=>b.date.localeCompare(a.date))
+    .map(x=>`
+      <div style="display:flex;justify-content:space-between;padding:10px;border-bottom:1px solid #555">
+        <span>${x.date} — ${x.count} tabak</span>
+        <button class="secondary" data-edit-plate="${x.date}">Düzenle</button>
+      </div>
+    `).join('');
+
+  document.querySelectorAll('[data-edit-plate]').forEach(btn=>{
+    btn.onclick=()=>{
+      const entry=data.plateEntries.find(x=>x.date===btn.dataset.editPlate);
+      if(!entry)return;
+      plateDate.value=entry.date;
+      plateCount.value=entry.count;
+      updatePlateTotals();
+    };
+  });
+}
+
+plateDate.addEventListener('change',updatePlateTotals);
+
+document.getElementById('savePlateEntry').onclick=()=>{
+  const date=plateDate.value;
+  const count=Number(plateCount.value);
+
+  if(!date || plateCount.value==='' || !Number.isInteger(count) || count<0){
+    alert('Tarih ve geçerli tabak sayısı girin.');
+    return;
+  }
+
+  const existing=data.plateEntries.find(x=>x.date===date);
+
+  if(existing) existing.count=count;
+  else data.plateEntries.push({date,count});
+
+  persist();
+  updatePlateTotals();
+  plateCount.value='';
+  alert('Günlük tabak sayısı kaydedildi.');
+};
+
+updatePlateTotals();
 render();
 </script>
 
