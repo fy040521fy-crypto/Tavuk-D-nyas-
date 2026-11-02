@@ -1655,25 +1655,36 @@ function updatePlateTotals(){
 
 plateDate.addEventListener('change',updatePlateTotals);
 
-document.getElementById('savePlateEntry').onclick=()=>{
-  const date=plateDate.value;
-  const count=Number(plateCount.value);
+document.addEventListener('click',function(e){
+  const btn=e.target.closest('#savePlateEntry');
+  if(!btn)return;
 
-  if(!date || plateCount.value==='' || !Number.isInteger(count) || count<0){
+  e.preventDefault();
+
+  const date=plateDate.value;
+  const raw=plateCount.value;
+  const count=Number(raw);
+
+  if(!date || raw==='' || !Number.isInteger(count) || count<0){
     alert('Tarih ve geçerli tabak sayısı girin.');
     return;
   }
 
   const existing=data.plateEntries.find(x=>x.date===date);
 
-  if(existing) existing.count=count;
-  else data.plateEntries.push({date,count});
+  if(existing){
+    existing.count=count;
+  }else{
+    data.plateEntries.push({date:date,count:count});
+  }
 
-  persist();
+  localStorage.setItem(key,JSON.stringify(data));
+
   updatePlateTotals();
   plateCount.value='';
+
   alert('Günlük tabak sayısı kaydedildi.');
-};
+},true);
 
 updatePlateTotals();
 render();
