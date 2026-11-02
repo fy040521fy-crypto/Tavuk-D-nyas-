@@ -606,7 +606,276 @@ button{
  <div id="historyList"></div>
  <div id="historyDetail"></div>
 </section>
-<footer><b>Gizlilik ve kullanım:</b> Bu deneme sürümü verileri yalnızca açıldığı cihazın/tarayıcının yerel hafızasında tutar. İnternet bağlantısı olsa bile hiçbir veriyi sunucuya göndermez ve cihazlar arasında otomatik eşitleme yapmaz. Yedek dosyasıyla elle taşıma mümkündür. Cihazlar arası ortak kullanım henüz etkin değildir. Gerçek şirket/personel/ciro verilerini şirket onayı ve onaylı altyapı olmadan girmeyin. Gıda güvenliği kontrollerinde işletmenizin resmî prosedürlerini esas alın.</footer>
+
+<section id="targetManagement" class="panel hidden">
+  <h2>🎯 PERSONEL HEDEF YÖNETİMİ</h2>
+  <p class="sub">Aylık hedefler, haftalık izinler ve otomatik günlük hedef dağılımı</p>
+
+  <div class="target-grid">
+    <div class="target-card">
+      <span>Genel aylık ciro hedefi</span>
+      <strong id="tmGeneralGoal">₺0</strong>
+    </div>
+    <div class="target-card">
+      <span>Gerçekleşen aylık ciro</span>
+      <strong id="tmRevenue">₺0</strong>
+    </div>
+    <div class="target-card">
+      <span>Kalan genel hedef</span>
+      <strong id="tmRemaining">₺0</strong>
+    </div>
+    <div class="target-card">
+      <span>Bugünkü personel hedefi</span>
+      <strong id="tmDailyGoal">₺0</strong>
+    </div>
+  </div>
+
+  <div class="target-panel" style="margin-top:14px">
+    <h3>👤 Personel aylık hedef tanımlama</h3>
+
+    <label>Personel adı</label>
+    <input id="tmName" list="tmStaffList" placeholder="Personel adını yazın">
+    <datalist id="tmStaffList"></datalist>
+
+    <label>Aylık ciro hedefi (₺)</label>
+    <input id="tmMonthlyTarget" type="number" min="0" placeholder="Örn. 350000">
+
+    <label>Haftalık izin günü</label>
+    <select id="tmDayOff">
+      <option value="7">İzin günü belirlenmedi</option>
+      <option value="1">Pazartesi</option>
+      <option value="2">Salı</option>
+      <option value="3">Çarşamba</option>
+      <option value="4">Perşembe</option>
+      <option value="5">Cuma</option>
+      <option value="6">Cumartesi</option>
+      <option value="0">Pazar</option>
+    </select>
+
+    <button class="primary" id="tmSave" style="width:100%">
+      Personel hedefini kaydet
+    </button>
+  </div>
+
+  <div class="target-panel" style="margin-top:14px">
+    <h3>📊 Personel hedef ve performans grafikleri</h3>
+    <p class="sub">Aylık gerçekleşme, kalan hedef ve günlük çalışma hedefleri</p>
+    <div id="tmStaffCards"></div>
+  </div>
+
+  <div class="target-panel" style="margin-top:14px">
+    <h3>📅 Günlük hedef dağılımı</h3>
+    <div id="tmDailyList"></div>
+  </div>
+</section>
+
+<script>
+(function(){
+  const section=document.getElementById('targetManagement');
+  const nav=document.querySelector('main>.tabs');
+
+  const tab=document.createElement('button');
+  tab.textContent='🎯 Hedef Yönetimi';
+  tab.dataset.tab='targetManagement';
+  nav.insertBefore(tab,nav.querySelector('details'));
+
+  document.querySelectorAll('[data-tab]').forEach(btn=>{
+    btn.addEventListener('click',()=>{
+      if(btn!==tab)section.classList.add('hidden');
+    });
+  });
+
+  tab.addEventListener('click',()=>{
+    section.classList.remove('hidden');
+    renderTargetManagement();
+  });
+
+  const days=['Pazar','Pazartesi','Salı','Çarşamba',
+              'Perşembe','Cuma','Cumartesi'];
+
+  function moneyTM(value){
+    return Number(value||0).toLocaleString('tr-TR',{
+      style:'currency',currency:'TRY',
+      maximumFractionDigits:0
+    });
+  }
+
+  function nameKey(name){
+    return String(name||'').trim().toLocaleLowerCase('tr-TR');
+  }
+
+  window.renderTargetManagement=function(){
+    data.staffTargets=data.staffTargets||{};
+
+    const now=new Date();
+    const year=now.getFullYear();
+    const month=now.getMonth();
+    const monthKey=year+'-'+String(month+1).padStart(2,'0');
+    const daysInMonth=new Date(year,month+1,0).getDate();
+
+    const monthlyRows=data.staff.filter(x=>
+      x.date&&x.date.slice(0,7)===monthKey
+    );
+
+    const totalRevenue=monthlyRows.reduce((s,x)=>
+      s+Number(x.revenue||0),0
+    );
+
+    const generalGoal=Number(data.monthlyGoals?.goalRevenue||0);
+
+    document.getElementById('tmGeneralGoal').textContent=moneyTM(generalGoal);
+    document.getElementById('tmRevenue').textContent=moneyTM(totalRevenue);
+    document.getElementById('tmRemaining').textContent=
+      moneyTM(Math.max(0,generalGoal-totalRevenue));
+
+    const people={};
+
+    monthlyRows.forEach(x=>{
+      const k=nameKey(x.name);
+      if(!k)return;
+      people[k]=x.name;
+    });
+
+    Object.values(data.staffTargets).forEach(x=>{
+      people[nameKey(x.name)]=x.name;
+    });
+
+    const names=Object.values(people);
+
+    document.getElementById('tmStaffList').innerHTML=
+      names.map(n=>'<option value="'+escapeTM(n)+'"></option>').join('');
+
+    let dailyGoal=0;
+    let dailyHTML='';
+    let cardsHTML='';
+
+    names.sort((a,b)=>a.localeCompare(b,'tr'));
+
+    names.forEach(name=>{
+      const key=nameKey(name);
+      const config=data.staffTargets[key]||{
+        name,monthlyTarget:0,dayOff:7
+      };
+
+      const target=Number(config.monthlyTarget||0);
+      const dayOff=Number(config.dayOff??7);
+
+      let workDays=0;
+      for(let d=1;d<=daysInMonth;d++){
+        if(dayOff===7||new Date(year,month,d).getDay()!==dayOff){
+          workDays++;
+        }
+      }
+
+      const personRows=monthlyRows.filter(x=>
+        nameKey(x.name)===key
+      );
+
+      const actual=personRows.reduce((s,x)=>
+        s+Number(x.revenue||0),0
+      );
+
+      const todayActual=personRows.filter(x=>x.date===today())
+        .reduce((s,x)=>s+Number(x.revenue||0),0);
+
+      const todayOff=dayOff!==7&&now.getDay()===dayOff;
+      const dailyTarget=workDays?target/workDays:0;
+      const pct=target?Math.round(actual/target*100):0;
+      const remaining=Math.max(0,target-actual);
+
+      if(!todayOff)dailyGoal+=dailyTarget;
+
+      cardsHTML+=`
+        <div class="target-card" style="margin-bottom:10px">
+          <div style="display:flex;justify-content:space-between;gap:8px">
+            <b>${escapeTM(name)}</b>
+            <b style="color:${pct>=100?'#34d399':'#f5cf62'}">${pct}%</b>
+          </div>
+          <div class="target-grid" style="margin-top:10px">
+            <div>Aylık hedef<strong>${moneyTM(target)}</strong></div>
+            <div>Gerçekleşen<strong>${moneyTM(actual)}</strong></div>
+            <div>Kalan<strong>${moneyTM(remaining)}</strong></div>
+            <div>Günlük hedef<strong>${moneyTM(dailyTarget)}</strong></div>
+          </div>
+          <div class="target-progress">
+            <span style="width:${Math.min(100,pct)}%"></span>
+          </div>
+          <p class="sub" style="margin:8px 0">
+            İzin: ${dayOff===7?'Belirlenmedi':days[dayOff]}
+            · Çalışma günü: ${workDays}
+            · Bugünkü satış: ${moneyTM(todayActual)}
+            ${todayOff?' · BUGÜN İZİNLİ':''}
+          </p>
+          <button class="secondary" data-edit-target="${escapeTM(key)}">
+            Hedefi düzenle
+          </button>
+        </div>`;
+
+      dailyHTML+=`
+        <div class="row">
+          <span>${escapeTM(name)}</span>
+          <b>${todayOff?'İZİNLİ':moneyTM(dailyTarget)}</b>
+        </div>`;
+    });
+
+    document.getElementById('tmDailyGoal').textContent=moneyTM(dailyGoal);
+
+    document.getElementById('tmStaffCards').innerHTML=
+      cardsHTML||'<div class="empty">Henüz personel bulunmuyor.</div>';
+
+    document.getElementById('tmDailyList').innerHTML=
+      dailyHTML||'<div class="empty">Hedef dağılımı bulunmuyor.</div>';
+
+    document.querySelectorAll('[data-edit-target]').forEach(btn=>{
+      btn.onclick=()=>{
+        const config=data.staffTargets[btn.dataset.editTarget];
+        if(!config)return;
+        document.getElementById('tmName').value=config.name;
+        document.getElementById('tmMonthlyTarget').value=config.monthlyTarget;
+        document.getElementById('tmDayOff').value=config.dayOff;
+        document.getElementById('tmName').scrollIntoView({
+          behavior:'smooth',block:'center'
+        });
+      };
+    });
+  };
+
+  function escapeTM(value){
+    return String(value||'').replace(/[&<>"']/g,c=>({
+      '&':'&amp;','<':'&lt;','>':'&gt;',
+      '"':'&quot;',"'":'&#39;'
+    }[c]));
+  }
+
+  document.getElementById('tmSave').onclick=()=>{
+    const name=document.getElementById('tmName').value.trim();
+    const target=document.getElementById('tmMonthlyTarget').value;
+    const dayOff=Number(document.getElementById('tmDayOff').value);
+
+    if(!name||target===''||!Number.isFinite(Number(target))||
+       Number(target)<0){
+      alert('Personel adı ve geçerli aylık hedef girin.');
+      return;
+    }
+
+    data.staffTargets=data.staffTargets||{};
+    data.staffTargets[nameKey(name)]={
+      name,
+      monthlyTarget:Number(target),
+      dayOff
+    };
+
+    persist();
+    renderTargetManagement();
+
+    alert('Personel hedefi ve haftalık izin kaydedildi.');
+    document.getElementById('tmName').value='';
+    document.getElementById('tmMonthlyTarget').value='';
+  };
+})();
+</script>
+
+ <footer><b>Gizlilik ve kullanım:</b> Bu deneme sürümü verileri yalnızca açıldığı cihazın/tarayıcının yerel hafızasında tutar. İnternet bağlantısı olsa bile hiçbir veriyi sunucuya göndermez ve cihazlar arasında otomatik eşitleme yapmaz. Yedek dosyasıyla elle taşıma mümkündür. Cihazlar arası ortak kullanım henüz etkin değildir. Gerçek şirket/personel/ciro verilerini şirket onayı ve onaylı altyapı olmadan girmeyin. Gıda güvenliği kontrollerinde işletmenizin resmî prosedürlerini esas alın.</footer>
 </main>
 <script>
 const defaultChecks=["Pişirme alanındaki ürünlerin SKT kontrolü","Dolap sıcaklıklarının kontrolü","Çorbaların sıcaklık ve durum kontrolü","Peçete, sıvı sabun ve dezenfektan kontrolü","Mutfak ve servis alanı temizlik kontrolü","Ekipman ve çalışma alanı kontrolü","Soğuk oda ve depolama düzeni kontrolü","Personel hijyen ve kıyafet kontrolü","Açılış hazırlıklarının tamamlanması","Kapanış temizliği ve ekipman kontrolü"];
@@ -1775,5 +2044,87 @@ h1,h2,h3{
     grid-template-columns:repeat(3,minmax(0,1fr))!important;
   }
   }
+/* HEDEF YÖNETİMİ - SİYAH ALTIN TASARIM */
+#targetManagement{
+  display:grid;
+  gap:12px;
+  color:#fff;
+}
+
+#targetManagement .target-panel{
+  background:linear-gradient(145deg,#191716,#29221c);
+  border:1px solid #805b25;
+  border-radius:14px;
+  padding:14px;
+  box-shadow:0 4px 14px #0005;
+}
+
+#targetManagement h2,
+#targetManagement h3{
+  color:#e5b12d;
+  margin:0 0 12px;
+}
+
+#targetManagement .target-grid{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:10px;
+}
+
+#targetManagement .target-card{
+  background:#211e1a;
+  border:1px solid #51412b;
+  border-radius:11px;
+  padding:12px;
+}
+
+#targetManagement .target-card strong{
+  display:block;
+  font-size:19px;
+  color:#f2c14e;
+  margin-top:6px;
+}
+
+#targetManagement input,
+#targetManagement select{
+  width:100%;
+  background:#151515;
+  color:white;
+  border:1px solid #80612e;
+  border-radius:8px;
+  padding:10px;
+  margin:5px 0 10px;
+}
+
+#targetManagement button{
+  border-radius:9px;
+  padding:10px 14px;
+  cursor:pointer;
+}
+
+#targetManagement .target-progress{
+  height:9px;
+  background:#403a30;
+  border-radius:20px;
+  overflow:hidden;
+  margin-top:8px;
+}
+
+#targetManagement .target-progress span{
+  display:block;
+  height:100%;
+  background:linear-gradient(90deg,#a87916,#f5cf62);
+  border-radius:20px;
+}
+
+#targetManagement .target-warning{
+  color:#ff8585;
+}
+
+@media(max-width:600px){
+  #targetManagement .target-grid{
+    grid-template-columns:repeat(2,minmax(0,1fr));
+  }
+ }
 </style></body></html>
 <script>if('serviceWorker' in navigator && location.protocol!=='file:'){window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{}));}</script>
