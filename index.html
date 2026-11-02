@@ -327,39 +327,40 @@ button{
 <section id="dashboard" class="panel">
   <h2>✨ Restoran Ana Paneli</h2>
   <p class="sub">Günlük performans ve operasyon özeti</p>
-  <div class="stats">
+ <div class="dash-card" id="monthlyGoals">
+<h3>🎯 RESTORAN AYLIK HEDEFLERİ</h3>
+<div class="formgrid">
+<label>Genel ciro hedefi (₺)<input id="goalRevenue" type="number" placeholder="8000000"></label>
+<label>Tabak hedefi<input id="goalPlates" type="number" placeholder="16000"></label>
+<label>Tatlı hedefi<input id="goalDessert" type="number" placeholder="1000"></label>
+<label>Çorba hedefi<input id="goalSoup" type="number" placeholder="2300"></label>
+</div>
+<p>Başlangıç hedefi: %10 · İçecek hedefi: %25</p>
+<button class="primary" id="saveMonthlyGoals">Aylık hedefleri kaydet</button>
+ </div>
+ <div class="stats">
     <div class="stat"><span>Bugünkü ciro</span><strong id="dashTodayRevenue">₺0</strong></div>
     <div class="stat"><span>Satış hedefi</span><strong id="dashTodayTarget">₺0</strong></div>
     <div class="stat"><span>Hedef gerçekleşme</span><strong id="dashTodayRate">-%</strong></div>
     <div class="stat"><span>Ürün adedi</span><strong id="dashTodayUnits">0</strong></div>
     <div class="stat"><span>Aylık ciro</span><strong id="dashMonthRevenue">₺0</strong></div>
   </div>
- <div class="dash-grid compact-dash">
-  <div class="dash-card">
-    <h3>📈 Aylık Ciro Grafiği</h3>
-    <div id="dashRevenueChart"></div>
-  </div>
+ <div class="dash-grid premium-graphs">
+  <div class="dash-card"><h3>💰 Genel Ciro</h3><div id="dashRevenueChart"></div></div>
+  <div class="dash-card"><h3>🍽️ Tabak Hedefi</h3><div id="dashPlateChart"></div></div>
+  <div class="dash-card"><h3>🟣 Başlangıç</h3><div id="dashStartChart"></div></div>
+  <div class="dash-card"><h3>🔵 K. Başlangıç</h3><div id="dashKStartChart"></div></div>
+  <div class="dash-card"><h3>🟢 İçecek</h3><div id="dashDrinkChart"></div></div>
+  <div class="dash-card"><h3>🍰 Tatlı</h3><div id="dashDessertChart"></div></div>
+  <div class="dash-card"><h3>🥣 Çorba</h3><div id="dashSoupChart"></div></div>
+  <div class="dash-card"><h3>🏆 Personel Performansı</h3><div id="dashStaffRanking"></div></div>
+  <div class="dash-card dash-span"><h3>📦 Stok Durumu</h3><div id="dashStockCards"></div></div>
 
-  <div class="dash-card">
-    <h3>🍩 Satış Dağılımı</h3>
+  <div style="display:none">
     <div id="dashSalesDistribution"></div>
-  </div>
-
-  <div class="dash-card">
-    <h3>📊 Ürün Satış Grafiği</h3>
     <div id="dashProductChart"></div>
   </div>
-
-  <div class="dash-card">
-    <h3>🏆 Personel Podyumu</h3>
-    <div id="dashStaffRanking"></div>
-  </div>
-
-  <div class="dash-card dash-span">
-    <h3>📦 Stok Durumu</h3>
-    <div id="dashStockCards"></div>
-  </div>
-</div>
+ </div>
 </section> 
 
  <nav class="tabs">
@@ -615,7 +616,22 @@ data.checks=data.checks||{};data.expiry=data.expiry||[];data.stock=data.stock||[
 data.checkItems=Array.isArray(data.checkItems)?data.checkItems:defaultChecks.slice();
 data.dailyInfo=data.dailyInfo||{};data.history=data.history||{};data.staff=Array.isArray(data.staff)?data.staff:[];
 data.checkDetails=data.checkDetails||{};
- const today=()=>{const d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;};
+ data.monthlyGoals=data.monthlyGoals||{};
+
+['goalRevenue','goalPlates','goalDessert','goalSoup'].forEach(id=>{
+ const el=document.getElementById(id);
+ if(el) el.value=data.monthlyGoals[id]||'';
+});
+document.getElementById('saveMonthlyGoals').onclick=()=>{
+ data.monthlyGoals={
+  goalRevenue:Number(document.getElementById('goalRevenue').value||0),
+  goalPlates:Number(document.getElementById('goalPlates').value||0),
+  goalDessert:Number(document.getElementById('goalDessert').value||0),
+  goalSoup:Number(document.getElementById('goalSoup').value||0)
+ };
+ persist();
+ alert('Aylık hedefler kaydedildi.');
+}; const today=()=>{const d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;};
 function persist(){localStorage.setItem(key,JSON.stringify(data));render();}
 function daysUntil(date){return Math.ceil((new Date(date+'T00:00:00')-new Date(today()+'T00:00:00'))/86400000);}
 function renderChecks(){
@@ -1145,7 +1161,47 @@ function renderDashboardVisual(){
   '<div style="font-size:19px;font-weight:800;color:'+color+';margin:7px 0">'+qty+' <small style="font-size:11px">'+esc(x.unit||'adet')+'</small></div>'+
   '<small style="color:'+color+'">'+(low?'⚠ Kritik stok':'✓ Stok yeterli')+'</small></div>';
  }).join('')+'</div>':'Henüz stok kaydı yok.';
-            }
+  // YENI AYRI AYRI SATIS GRAFIKLERI
+  const monthTotal=arr=>arr.reduce((s,x)=>s+Number(x||0),0);
+  const metrics=[
+    ['Başlangıç','start','#b45cff','dashStartChart'],
+    ['K. Başlangıç','kstart','#438cff','dashKStartChart'],
+    ['İçecek','drink','#10c99a','dashDrinkChart'],
+    ['Tatlı','dessert','#ff55a5','dashDessertChart'],
+    ['Çorba','soup','#ffad32','dashSoupChart']
+  ];
+  const plateTotal=monthRows.reduce((s,x)=>s+units([x]),0);
+  const colors=['#f7bd55','#b45cff','#438cff','#10c99a','#ff55a5','#ffad32'];
+
+  function miniVisual(value,total,color,label){
+    const pct=total?Math.round(value/total*100):0;
+    const circumference=251;
+    const dash=circumference*pct/100;
+    return '<div style="display:flex;align-items:center;gap:12px;padding:8px 0">'+
+      '<svg viewBox="0 0 100 100" width="105" height="105">'+
+      '<circle cx="50" cy="50" r="40" fill="none" stroke="#44334f" stroke-width="11"/>'+
+      '<circle cx="50" cy="50" r="40" fill="none" stroke="'+color+'" stroke-width="11" stroke-linecap="round" stroke-dasharray="'+dash+' '+circumference+'" transform="rotate(-90 50 50)"/>'+
+      '<text x="50" y="47" text-anchor="middle" fill="white" font-size="19" font-weight="bold">'+pct+'%</text>'+
+      '<text x="50" y="62" text-anchor="middle" fill="#d8c6e8" font-size="8">PAY</text></svg>'+
+      '<div><div style="font-size:25px;font-weight:900;color:'+color+'">'+value.toLocaleString('tr-TR')+'</div>'+
+      '<small style="color:#d8c6e8">Bu ay gerçekleşen</small><br>'+
+      '<small style="color:#a99ab8">'+label+'</small></div></div>';
+  }
+
+  document.getElementById('dashPlateChart').innerHTML=
+    '<div style="text-align:center;padding:12px">'+
+    '<div style="font-size:34px;font-weight:900;color:#f7bd55">'+plateTotal.toLocaleString('tr-TR')+'</div>'+
+    '<div style="color:#d8c6e8">Bu ay toplam ürün adedi</div>'+
+    '<div style="height:9px;border-radius:20px;background:#44334f;margin-top:14px;overflow:hidden">'+
+    '<div style="height:100%;width:100%;background:linear-gradient(90deg,#f7bd55,#ff8c42);border-radius:20px"></div></div>'+
+    '<small style="color:#b9a9c8">Aylık tabak hedefi girildiğinde hedef göstergesi eklenecek</small></div>';
+
+  metrics.forEach(([label,key,color,id])=>{
+    const value=monthTotal(monthRows.map(x=>x[key]));
+    const pct=plateTotal?Math.round(value/plateTotal*100):0;
+    document.getElementById(id).innerHTML=miniVisual(value,plateTotal,color,'%'+pct+' toplam satış içindeki payı');
+  });            
+}
 
 
 
