@@ -607,43 +607,29 @@ button{
  <div id="historyDetail"></div>
 </section>
 
+
 <section id="targetManagement" class="panel hidden">
   <h2>🎯 PERSONEL HEDEF YÖNETİMİ</h2>
-  <p class="sub">Aylık hedefler, haftalık izinler ve otomatik günlük hedef dağılımı</p>
+  <p class="sub">Personel bazlı günlük ve aylık satış performansı</p>
 
-  <div class="target-grid">
-    <div class="target-card">
-      <span>Genel aylık ciro hedefi</span>
-      <strong id="tmGeneralGoal">₺0</strong>
-    </div>
-    <div class="target-card">
-      <span>Gerçekleşen aylık ciro</span>
-      <strong id="tmRevenue">₺0</strong>
-    </div>
-    <div class="target-card">
-      <span>Kalan genel hedef</span>
-      <strong id="tmRemaining">₺0</strong>
-    </div>
-    <div class="target-card">
-      <span>Bugünkü personel hedefi</span>
-      <strong id="tmDailyGoal">₺0</strong>
-    </div>
+  <div class="target-panel">
+    <h3>📊 Personel performansları</h3>
+    <p class="sub">Bir personelin kartına dokunarak tüm hedef ve satış detaylarını görüntüleyin.</p>
+    <div id="tmStaffCards"></div>
   </div>
 
-  <div class="target-panel" style="margin-top:14px">
-    <h3>👤 Personel aylık hedef tanımlama</h3>
-
-    <label>Personel adı</label>
-    <input id="tmName" list="tmStaffList" placeholder="Personel adını yazın">
-    <datalist id="tmStaffList"></datalist>
-
-    <label>Otomatik hesaplanan aylık ciro hedefi</label>
-<input id="tmMonthlyTarget" type="text" readonly placeholder="Genel hedeften hesaplanır">
-
-    <label>Haftalık izin günü</label>
+  <!-- Eski hesaplama kodlarıyla uyumluluk alanı -->
+  <div style="display:none">
+    <strong id="tmGeneralGoal">₺0</strong>
+    <strong id="tmRevenue">₺0</strong>
+    <strong id="tmRemaining">₺0</strong>
+    <strong id="tmDailyGoal">₺0</strong>
+    <div id="tmStaffList"></div>
+    <div id="tmDailyList"></div>
+    <input id="tmName">
+    <input id="tmMonthlyTarget">
     <select id="tmDayOff">
-      <option value="1" selected>Pazartesi</option>
-      
+      <option value="1">Pazartesi</option>
       <option value="2">Salı</option>
       <option value="3">Çarşamba</option>
       <option value="4">Perşembe</option>
@@ -651,23 +637,11 @@ button{
       <option value="6">Cumartesi</option>
       <option value="0">Pazar</option>
     </select>
-
-    <button class="primary" id="tmSave" style="width:100%">
-      Personel hedefini kaydet
-    </button>
-  </div>
-
-  <div class="target-panel" style="margin-top:14px">
-    <h3>📊 Personel hedef ve performans grafikleri</h3>
-    <p class="sub">Aylık gerçekleşme, kalan hedef ve günlük çalışma hedefleri</p>
-    <div id="tmStaffCards"></div>
-  </div>
-
-  <div class="target-panel" style="margin-top:14px">
-    <h3>📅 Günlük hedef dağılımı</h3>
-    <div id="tmDailyList"></div>
+    <button id="tmSave">Kaydet</button>
   </div>
 </section>
+
+
 
 <script>
 (function(){
