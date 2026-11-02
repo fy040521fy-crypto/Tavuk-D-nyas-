@@ -2313,56 +2313,6 @@ h1,h2,h3{
   }
 }
 </style>
-<script>
- alert('Tabak kodu çalışıyor');
- // GÜNLÜK TABAK KAYIT SİSTEMİ
-data.plateEntries = Array.isArray(data.plateEntries)
-  ? data.plateEntries : [];
 
-function updatePlateTotals(){
-  const date = document.getElementById('plateEntryDate').value;
-  const month = date.slice(0,7);
 
-  const daily = data.plateEntries
-    .filter(x => x.date === date)
-    .reduce((s,x) => s + Number(x.count || 0), 0);
-
-  const monthly = data.plateEntries
-    .filter(x => x.date.slice(0,7) === month)
-    .reduce((s,x) => s + Number(x.count || 0), 0);
-
-  const goal = Number(data.monthlyGoals?.goalPlates || 0);
-
-  document.getElementById('plateTodayTotal').textContent = daily;
-  document.getElementById('plateMonthTotal').textContent = monthly;
-  document.getElementById('plateRemaining').textContent =
-    Math.max(0, goal - monthly);
-}
-
-document.getElementById('savePlateEntry').onclick = () => {
-  const date = document.getElementById('plateEntryDate').value;
-  const count = Number(document.getElementById('plateEntryCount').value);
-
-  if (!date || !Number.isInteger(count) || count < 0) {
-    alert('Tarih ve geçerli tabak sayısı girin.');
-    return;
-  }
-
-  const existing = data.plateEntries.find(x => x.date === date);
-
-  if (existing) {
-    existing.count = count;
-  } else {
-    data.plateEntries.push({date, count});
-  }
-
-  persist();
-  updatePlateTotals();
-
-  document.getElementById('plateEntryCount').value = '';
-  alert('Günlük tabak sayısı kaydedildi.');
-};
-
-updatePlateTotals();
- </script> 
 <script>if('serviceWorker' in navigator && location.protocol!=='file:'){window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{}));}</script>
