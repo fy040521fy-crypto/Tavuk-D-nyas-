@@ -2243,8 +2243,9 @@ h1,h2,h3{
     grid-column:1 !important;
   }
 }
-</style></body></html>
-// GÜNLÜK TABAK KAYIT SİSTEMİ
+</style>
+<script>
+ // GÜNLÜK TABAK KAYIT SİSTEMİ
 data.plateEntries = Array.isArray(data.plateEntries)
   ? data.plateEntries : [];
 
@@ -2293,4 +2294,5 @@ document.getElementById('savePlateEntry').onclick = () => {
 };
 
 updatePlateTotals();
+ </script> 
 <script>if('serviceWorker' in navigator && location.protocol!=='file:'){window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{}));}</script>
