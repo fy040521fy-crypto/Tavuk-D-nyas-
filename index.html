@@ -1529,5 +1529,163 @@ main {
 }
 
 
+
+/* YENI ANA TASARIM - SIYAH ALTIN KIRMIZI */
+:root{
+ --bg:#070707;
+ --panel:#111114;
+ --gold:#f5bd45;
+ --gold2:#ffdf83;
+ --red:#c90019;
+ --green:#19d99a;
+ --purple:#c34cff;
+ --blue:#27c8ff;
+ --ink:#fff8e9;
+ --muted:#b9b5ad;
+ --line:#805b25;
+}
+html,body{
+ background:#070707!important;
+ color:var(--ink)!important;
+}
+body{
+ background:
+ radial-gradient(ellipse at 80% 0%,#241308 0%,transparent 42%),
+ linear-gradient(135deg,#080808,#101014 65%,#080808)!important;
+}
+body>main{
+ background:transparent!important;
+}
+body>main>.tabs{
+ background:linear-gradient(180deg,#170607,#080808)!important;
+ border-right:2px solid var(--red)!important;
+ box-shadow:5px 0 28px #d0002528!important;
+}
+body>main>.tabs button{
+ color:#fff!important;
+ background:transparent!important;
+ border:1px solid transparent!important;
+ border-radius:10px!important;
+ font-size:12px!important;
+ padding:11px 8px!important;
+}
+body>main>.tabs button.active{
+ background:linear-gradient(110deg,#a90016,#ed142b)!important;
+ border:1px solid #ff6674!important;
+ box-shadow:0 0 18px #e0003b70!important;
+ color:white!important;
+}
+.menu-group{
+ color:var(--gold2)!important;
+ border-color:#68451d!important;
+}
+#dashboard{
+ background:transparent!important;
+ border:0!important;
+ box-shadow:none!important;
+ padding:5px!important;
+}
+#dashboard>h2,#dashboard>.sub{
+ display:none!important;
+}
+#dashboard .stats{
+ display:grid!important;
+ grid-template-columns:repeat(4,minmax(0,1fr))!important;
+ gap:10px!important;
+ margin-bottom:12px!important;
+}
+#dashboard .stat{
+ background:linear-gradient(145deg,#24201a,#101012)!important;
+ border:1px solid var(--gold)!important;
+ border-radius:13px!important;
+ box-shadow:0 0 13px #f5bd4525,inset 0 0 12px #f5bd4510!important;
+ padding:13px!important;
+}
+#dashboard .stat span{
+ color:var(--gold2)!important;
+ font-size:11px!important;
+}
+#dashboard .stat strong{
+ color:white!important;
+ font-size:clamp(15px,2vw,23px)!important;
+}
+#dashboard .dash-grid{
+ display:grid!important;
+ grid-template-columns:repeat(2,minmax(0,1fr))!important;
+ gap:12px!important;
+ margin-top:10px!important;
+}
+#dashboard .dash-card{
+ min-width:0!important;
+ height:auto!important;
+ min-height:190px!important;
+ padding:13px!important;
+ border:1px solid var(--gold)!important;
+ border-radius:16px!important;
+ background:
+ radial-gradient(circle at 90% 0%,#38230d55,transparent 45%),
+ linear-gradient(145deg,#1b1916,#0d0d10)!important;
+ box-shadow:0 0 15px #f5bd4525,inset 0 0 15px #ffffff08!important;
+ overflow:hidden!important;
+}
+#dashboard .dash-card h3{
+ color:var(--gold2)!important;
+ font-size:14px!important;
+ margin:0 0 10px!important;
+}
+#dashboard .dash-card strong,
+#dashboard .dash-card b{
+ color:white!important;
+}
+#dashboard .dash-span{
+ grid-column:1/-1!important;
+}
+#dashboard svg{
+ max-width:100%!important;
+}
+#dashboard button{
+ border-radius:9px!important;
+}
+input,select,textarea{
+ background:#151515!important;
+ color:white!important;
+ border:1px solid #8b682f!important;
+}
+button.primary{
+ background:linear-gradient(110deg,#a90016,#e51b2d)!important;
+ border:1px solid #ff6674!important;
+ color:white!important;
+ box-shadow:0 0 12px #d0002545!important;
+}
+.panel:not(#dashboard){
+ background:linear-gradient(145deg,#191716,#0d0d10)!important;
+ border:1px solid #805b25!important;
+ color:white!important;
+}
+h1,h2,h3{
+ color:var(--gold2)!important;
+}
+@media(max-width:700px){
+ #dashboard .stats{
+  grid-template-columns:repeat(2,minmax(0,1fr))!important;
+ }
+ #dashboard .dash-grid{
+  grid-template-columns:repeat(2,minmax(0,1fr))!important;
+  gap:8px!important;
+ }
+ #dashboard .dash-card{
+  min-height:160px!important;
+  padding:9px!important;
+ }
+}
+@media(max-width:600px) and (orientation:landscape){
+ #dashboard .stats{
+  grid-template-columns:repeat(4,minmax(0,1fr))!important;
+ }
+ #dashboard .dash-grid{
+  grid-template-columns:repeat(3,minmax(0,1fr))!important;
+ }
+}
+
 </style></body></html>
 <script>if('serviceWorker' in navigator && location.protocol!=='file:'){window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{}));}</script>
