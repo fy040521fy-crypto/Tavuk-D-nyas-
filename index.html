@@ -834,8 +834,12 @@ cardsHTML+=`
       <p style="font-size:12px;margin-top:12px">
         İzin: ${days[dayOff]} · Çalışma günü: ${workDays}
       </p>
-      <p style="font-size:12px">Günlük ciro hedefi: ${moneyTM(dailyTarget)}</p>
-      <button class="secondary" data-edit-target="${escapeTM(key)}">İzin gününü düzenle</button>
+      <label style="font-size:12px">Haftalık izin günü</label>
+<select data-dayoff-target="${escapeTM(key)}"
+style="width:100%;padding:10px;border-radius:10px">
+${days.map((day,i)=>`<option value="${i}" ${dayOff===i?'selected':''}>${day}</option>`).join('')}
+</select>
+      
     </div>
   </details>`;
 
@@ -867,7 +871,17 @@ cardsHTML+=`
         });
       };
     });
+   document.querySelectorAll('[data-dayoff-target]').forEach(select=>{
+  select.onchange=()=>{
+    const key=select.dataset.dayoffTarget;
+    if(!data.staffTargets[key])return;
+    data.staffTargets[key].dayOff=Number(select.value);
+    persist();
+    renderTargetManagement();
   };
+});
+  };
+ 
 
   function escapeTM(value){
     return String(value||'').replace(/[&<>"']/g,c=>({
