@@ -723,10 +723,7 @@ button{
 
     const generalGoal=Number(data.monthlyGoals?.goalRevenue||0);
 
-    document.getElementById('tmGeneralGoal').textContent=moneyTM(generalGoal);
-    document.getElementById('tmRevenue').textContent=moneyTM(totalRevenue);
-    document.getElementById('tmRemaining').textContent=
-      moneyTM(Math.max(0,generalGoal-totalRevenue));
+    
 
     const people={};
 
