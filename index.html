@@ -2186,5 +2186,62 @@ h1,h2,h3{
     grid-template-columns:repeat(2,minmax(0,1fr));
   }
  }
+/* GENİŞ VE OKUNAKLI ANA SAYFA KUTULARI */
+#dashboard .dash-grid{
+  grid-template-columns:repeat(2,minmax(0,1fr)) !important;
+  gap:14px !important;
+}
+
+#dashboard .dash-card{
+  width:100%;
+  min-width:0;
+  box-sizing:border-box;
+  padding:16px !important;
+}
+
+#dashboard .dash-grid > div:has(#plateEntryDate){
+  grid-column:1 / -1 !important;
+  width:100% !important;
+  min-width:0 !important;
+  box-sizing:border-box;
+}
+
+#dashboard .formgrid:has(#plateEntryDate){
+  grid-template-columns:repeat(2,minmax(0,1fr)) !important;
+  gap:12px !important;
+}
+
+#dashboard #plateEntryDate,
+#dashboard #plateEntryCount{
+  width:100% !important;
+  min-width:0 !important;
+  box-sizing:border-box !important;
+  font-size:16px !important;
+}
+
+#dashboard #savePlateEntry{
+  width:100% !important;
+  padding:14px !important;
+  font-size:16px !important;
+}
+
+#dashboard .stats:has(#plateTodayTotal){
+  grid-template-columns:repeat(2,minmax(0,1fr)) !important;
+  gap:10px !important;
+}
+
+#dashboard .stat{
+  min-width:0;
+  overflow-wrap:anywhere;
+}
+
+@media(max-width:520px){
+  #dashboard .dash-grid{
+    grid-template-columns:1fr !important;
+  }
+  #dashboard .dash-grid > div:has(#plateEntryDate){
+    grid-column:1 !important;
+  }
+}
 </style></body></html>
 <script>if('serviceWorker' in navigator && location.protocol!=='file:'){window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{}));}</script>
