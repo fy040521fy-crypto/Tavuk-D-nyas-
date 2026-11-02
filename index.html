@@ -2329,6 +2329,56 @@ h1,h2,h3{
 document.addEventListener('DOMContentLoaded', function() {
   const panel = document.getElementById('plateEntryPanel');
   const hedef = document.getElementById('monthlyGoals');
+  const btn = document.getElementById('savePlateEntry');
+  const tarih = document.getElementById('plateEntryDate');
+  const sayi = document.getElementById('plateEntryCount');
+
+  if (panel && hedef) hedef.appendChild(panel);
+  if (!btn || !tarih || !sayi) return;
+
+  if (!tarih.value) tarih.value = new Date().toISOString().slice(0,10);
+
+  btn.onclick = function() {
+    const date = tarih.value;
+    const raw = sayi.value;
+    const count = Number(raw);
+
+    if (!date || raw === '' || !Number.isInteger(count) || count < 0) {
+      alert('Tarih ve geçerli tabak sayısı girin.');
+      return;
+    }
+
+    let data = JSON.parse(localStorage.getItem('restaurant-manager-v1') || '{}');
+    data.plateEntries = Array.isArray(data.plateEntries) ? data.plateEntries : [];
+
+    const old = data.plateEntries.find(x => x.date === date);
+    if (old) old.count = count;
+    else data.plateEntries.push({date, count});
+
+    localStorage.setItem('restaurant-manager-v1', JSON.stringify(data));
+
+    const month = date.slice(0,7);
+    const total = data.plateEntries
+      .filter(x => x.date && x.date.slice(0,7) === month)
+      .reduce((sum,x) => sum + Number(x.count || 0), 0);
+
+    const goal = Number(data.monthlyGoals?.goalPlates || 0);
+
+    document.getElementById('plateTodayTotal').textContent =
+      data.plateEntries.filter(x => x.date === date)
+      .reduce((sum,x) => sum + Number(x.count || 0), 0);
+
+    document.getElementById('plateMonthTotal').textContent = total;
+    document.getElementById('plateRemaining').textContent = Math.max(0,goal-total);
+
+    sayi.value = '';
+    alert('Tabak sayısı kaydedildi!');
+  };
+});
+</script>
+document.addEventListener('DOMContentLoaded', function() {
+  const panel = document.getElementById('plateEntryPanel');
+  const hedef = document.getElementById('monthlyGoals');
 
   if (panel && hedef) {
     panel.style.marginTop = '12px';
